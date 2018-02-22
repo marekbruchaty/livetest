@@ -1,0 +1,96 @@
+<application>
+  <component name="ProjectJdkTable">
+    <jdk version="2">
+      <name value="Kotlin SDK" />
+      <type value="KotlinSDK" />
+      <version value="1.2.30-eap-60" />
+      <homePath value="$KOTLIN_BUNDLED$" />
+      <roots>
+        <annotationsPath>
+          <root type="composite" />
+        </annotationsPath>
+        <classPath>
+          <root type="composite" />
+        </classPath>
+        <javadocPath>
+          <root type="composite" />
+        </javadocPath>
+        <sourcePath>
+          <root type="composite" />
+        </sourcePath>
+      </roots>
+      <additional />
+    </jdk>
+    <jdk version="2">
+      <name value="Python 3.6 (python-tests)" />
+      <type value="Python SDK" />
+      <version value="Python 3.6.3" />
+      <homePath value="/work/priv/python/python-tests/venv/bin/python" />
+      <roots>
+        <annotationsPath>
+          <root type="composite" />
+        </annotationsPath>
+        <classPath>
+          <root type="composite">
+            <root url="file:///work/priv/python/python-tests/venv/lib/python3.6" type="simple" />
+            <root url="file:///work/priv/python/python-tests/venv/lib/python3.6/lib-dynload" type="simple" />
+            <root url="file:///usr/local/Cellar/python3/3.6.3/Frameworks/Python.framework/Versions/3.6/lib/python3.6" type="simple" />
+            <root url="file:///work/priv/python/python-tests/venv/lib/python3.6/site-packages" type="simple" />
+            <root url="file:///work/priv/livetest/build/idea-sandbox/system/python_stubs/-441959553" type="simple" />
+            <root url="file://$APPLICATION_PLUGINS_DIR$/python-ce/helpers/python-skeletons" type="simple" />
+            <root url="file://$APPLICATION_PLUGINS_DIR$/python-ce/helpers/typeshed/stdlib/3.6" type="simple" />
+            <root url="file://$APPLICATION_PLUGINS_DIR$/python-ce/helpers/typeshed/stdlib/3.5" type="simple" />
+            <root url="file://$APPLICATION_PLUGINS_DIR$/python-ce/helpers/typeshed/stdlib/3.4" type="simple" />
+            <root url="file://$APPLICATION_PLUGINS_DIR$/python-ce/helpers/typeshed/stdlib/3.3" type="simple" />
+            <root url="file://$APPLICATION_PLUGINS_DIR$/python-ce/helpers/typeshed/stdlib/3" type="simple" />
+            <root url="file://$APPLICATION_PLUGINS_DIR$/python-ce/helpers/typeshed/stdlib/2and3" type="simple" />
+            <root url="file://$APPLICATION_PLUGINS_DIR$/python-ce/helpers/typeshed/third_party/3" type="simple" />
+            <root url="file://$APPLICATION_PLUGINS_DIR$/python-ce/helpers/typeshed/third_party/2and3" type="simple" />
+          </root>
+        </classPath>
+        <javadocPath>
+          <root type="composite" />
+        </javadocPath>
+        <sourcePath>
+          <root type="composite" />
+        </sourcePath>
+      </roots>
+      <additional ASSOCIATED_PROJECT_PATH="/work/priv/python/python-tests" />
+    </jdk>
+    <jdk version="2">
+      <name value="Python 3.6" />
+      <type value="Python SDK" />
+      <version value="Python 3.6.3" />
+      <homePath value="/usr/local/bin/python3.6" />
+      <roots>
+        <annotationsPath>
+          <root type="composite" />
+        </annotationsPath>
+        <classPath>
+          <root type="composite">
+            <root url="file:///usr/local/Cellar/python3/3.6.3/Frameworks/Python.framework/Versions/3.6/lib/python3.6" type="simple" />
+            <root url="file:///usr/local/Cellar/python3/3.6.3/Frameworks/Python.framework/Versions/3.6/lib/python3.6/lib-dynload" type="simple" />
+            <root url="file:///usr/local/lib/python3.6/site-packages" type="simple" />
+            <root url="file:///work/priv/livetest/build/idea-sandbox/system/python_stubs/-1199943127" type="simple" />
+            <root url="file://$APPLICATION_PLUGINS_DIR$/python-ce/helpers/python-skeletons" type="simple" />
+            <root url="file://$APPLICATION_PLUGINS_DIR$/python-ce/helpers/typeshed/stdlib/3.6" type="simple" />
+            <root url="file://$APPLICATION_PLUGINS_DIR$/python-ce/helpers/typeshed/stdlib/3.5" type="simple" />
+            <root url="file://$APPLICATION_PLUGINS_DIR$/python-ce/helpers/typeshed/stdlib/3.4" type="simple" />
+            <root url="file://$APPLICATION_PLUGINS_DIR$/python-ce/helpers/typeshed/stdlib/3.3" type="simple" />
+            <root url="file://$APPLICATION_PLUGINS_DIR$/python-ce/helpers/typeshed/stdlib/3" type="simple" />
+            <root url="file://$APPLICATION_PLUGINS_DIR$/python-ce/helpers/typeshed/stdlib/2and3" type="simple" />
+            <root url="file://$APPLICATION_PLUGINS_DIR$/python-ce/helpers/typeshed/third_party/3" type="simple" />
+            <root url="file://$APPLICATION_PLUGINS_DIR$/python-ce/helpers/typeshed/third_party/2and3" type="simple" />
+          </root>
+        </classPath>
+        <javadocPath>
+          <root type="composite" />
+        </javadocPath>
+        <sourcePath>
+          <root type="composite" />
+        </sourcePath>
+      </roots>
+      <additional />
+    </jdk>
+  </component>
+</application>
