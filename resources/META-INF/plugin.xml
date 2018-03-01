@@ -33,7 +33,7 @@
   <actions>
     <!-- Add your actions here -->
     <action id="PluginStatusActionId" class="actions.PluginStatus" text="PluginStatus" description="Plugin status">
-      <add-to-group group-id="MainMenu" anchor="first"/>
+      <add-to-group group-id="HelpMenu" anchor="last"/>
     </action>
   </actions>
 

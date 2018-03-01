@@ -2,28 +2,28 @@ import com.intellij.openapi.components.ApplicationComponent;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.vfs.VirtualFileManager;
 import listeners.LivetestFileListener;
+import listeners.ProjectManagerListenerImpl;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.logging.Logger;
 
 public class PluginInitialization implements ApplicationComponent {
 
-  private static final Logger LOGGER = Logger.getLogger(PluginInitialization.class.getName());
+  private static final Logger log = Logger.getLogger(PluginInitialization.class.getName());
 
   @Override
   public void initComponent() {
-    LOGGER.info("Component initialization");
+    initListeners();
+  }
 
-    VirtualFileManager.getInstance().addVirtualFileListener(new LivetestFileListener());
-//    ProjectManager.getInstance().getOpenProjects();
-
-//    PsiManager.getInstance(ProjectManager.getInstance().getOpenProjects()[1]).addPsiTreeChangeListener();
-
+  private void initListeners() {
+    ProjectManager.getInstance().addProjectManagerListener(new ProjectManagerListenerImpl()); // Project info
+    VirtualFileManager.getInstance().addVirtualFileListener(new LivetestFileListener()); // File change info
   }
 
   @Override
   public void disposeComponent() {
-    LOGGER.info("Component disposal");
+    log.info("Component disposal");
   }
 
   @Override

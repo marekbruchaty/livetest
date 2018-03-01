@@ -1,4 +1,4 @@
-package datastores;
+package resources;
 
 import com.intellij.openapi.project.Project;
 
@@ -19,7 +19,7 @@ public class DataStore {
     return activeProject;
   }
 
-  public void setActiveProject(Project activeProject) {
-    this.activeProject = activeProject;
+  public void setActiveProject(Project project) {
+    this.activeProject = project;
   }
 }

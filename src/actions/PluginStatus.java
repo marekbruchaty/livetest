@@ -18,9 +18,9 @@ public class PluginStatus extends AnAction {
 
     @Override
     public void actionPerformed(AnActionEvent e) {
-        Project project = e.getProject();
         LOGGER.info("Hello action activated.");
-        Messages.showMessageDialog(project, "Hello world!", "Greeting", Messages.getInformationIcon());
+        Project project = e.getProject();
         FileUtils.getAllProjectFiles(project);
+//        Messages.showMessageDialog(project, "Hello world!", "Greeting", Messages.getInformationIcon());
     }
 }
