@@ -7,9 +7,9 @@ import resources.DataStore;
 
 import java.util.logging.Logger;
 
-public class ProjectManagerListenerImpl implements VetoableProjectManagerListener {
+public class LivetestProjectManagerListenerImpl implements VetoableProjectManagerListener {
 
-    private static final Logger log = Logger.getLogger(ProjectManagerListenerImpl.class.getName());
+    private static final Logger log = Logger.getLogger(LivetestProjectManagerListenerImpl.class.getName());
 
     @Override
     public void projectOpened(Project project) {
