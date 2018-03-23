@@ -5,11 +5,12 @@ import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileEvent;
 import com.intellij.openapi.vfs.VirtualFileListener;
-
-import java.util.logging.Logger;
-
+import model.FileLine;
 import org.jetbrains.annotations.NotNull;
 import resources.DataStore;
+
+import java.util.ArrayList;
+import java.util.logging.Logger;
 
 public class LivetestFileListener implements VirtualFileListener {
 
@@ -19,46 +20,45 @@ public class LivetestFileListener implements VirtualFileListener {
         log.info("listeners.LivetestFileListener instantiated");
     }
 
-    @Override
-    public void beforeContentsChange(@NotNull VirtualFileEvent event) {
+    @Override public void beforeContentsChange(@NotNull VirtualFileEvent event) {
         if (isPythonFile(event.getFile())) {
-            VirtualFile file = getVirtualFile(event);
-            DataStore.getInstance().getLastChangedFile().setOriginalCharSequence(getFileCharSequence(file));
+            DataStore.getInstance().initChangedFile();
+            DataStore.getInstance().getLastChangedFile().setOriginalContent(getTest(event));
+//            System.out.println("beforeContentsChange file: " + getTest(event));
+//            System.out.println("NewModificationStamp: " + event.getNewModificationStamp());
+//            System.out.println("OldModificationStamp: " + event.getOldModificationStamp());
         }
     }
 
-    @Override
-    public void contentsChanged(@NotNull VirtualFileEvent event) {
+    @Override public void contentsChanged(@NotNull VirtualFileEvent event) {
         if (isPythonFile(event.getFile())) {
-            VirtualFile file = getVirtualFile(event);
-            DataStore.getInstance().getLastChangedFile().setModifiedCharSequence(getFileCharSequence(file));
+            DataStore.getInstance().getLastChangedFile().setModifiedContent(getTest(event));
 
-            DataStore.getInstance().getLastChangedFile().getChangedSequences();
+            ArrayList<FileLine> changes =
+                DataStore.getInstance().getLastChangedFile().getChangedSequences();
+//            System.out.println("beforeContentsChange file: " + getTest(event));
+//            System.out.println("File changes: ");
+//            System.out.println(changes);
 //            DataStore.getInstance().getLastChangedFile().printOrigFile();
-//            DataStore.getInstance().getLastChangedFile().printModFile();
+//            DataStore.getInstance().getLastChangedFile().pri ntModFile();
         }
     }
 
-    @Override
-    public void beforeFileDeletion(@NotNull VirtualFileEvent event) {
+    @Override public void beforeFileDeletion(@NotNull VirtualFileEvent event) {
         if (isPythonFile(event.getFile())) {
-            VirtualFile file = getVirtualFile(event);
-            getFileCharSequence(file);
+            getTest(event);
         }
     }
 
-    @NotNull
-    private VirtualFile getVirtualFile(@NotNull VirtualFileEvent event) {
+    @NotNull private VirtualFile getVirtualFile(@NotNull VirtualFileEvent event) {
         VirtualFile file = event.getFile();
         log.info(String.format("File '%s' has been modified.", file.getName()));
         return file;
     }
 
-    private String
-    getFileCharSequence(VirtualFile file) {
-        Document document = FileDocumentManager.getInstance().getDocument(file);
-        System.out.println("getImmutableCharSequence: " + document.getImmutableCharSequence());
-        return document != null ? document.getImmutableCharSequence().toString() : null;
+    private String getTest(VirtualFileEvent fileEvent) {
+        Document document = FileDocumentManager.getInstance().getDocument(fileEvent.getFile());
+        return document != null ? document.getText() : null;
     }
 
     private boolean isPythonFile(VirtualFile file) {

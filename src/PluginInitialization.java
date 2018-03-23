@@ -1,11 +1,13 @@
 import com.intellij.openapi.components.ApplicationComponent;
+import com.intellij.openapi.editor.EditorFactory;
+import com.intellij.openapi.editor.event.EditorEventMulticaster;
+import com.intellij.openapi.editor.impl.event.EditorEventMulticasterImpl;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.vfs.VirtualFileManager;
-import com.intellij.psi.PsiManager;
+import listeners.LivetestDocumentListener;
 import listeners.LivetestFileListener;
 import listeners.LivetestProjectManagerListenerImpl;
 import org.jetbrains.annotations.NotNull;
-import resources.DataStore;
 
 import java.util.logging.Logger;
 
@@ -16,12 +18,12 @@ public class PluginInitialization implements ApplicationComponent {
   @Override
   public void initComponent() {
     initListeners();
-//    PsiManager.getInstance(DataStore.getInstance().getActiveProject()).addPsiTreeChangeListener(null);
   }
 
   private void initListeners() {
-    ProjectManager.getInstance().addProjectManagerListener(new LivetestProjectManagerListenerImpl()); // Project info
-    VirtualFileManager.getInstance().addVirtualFileListener(new LivetestFileListener()); // File change info
+//    ProjectManager.getInstance().addProjectManagerListener(new LivetestProjectManagerListenerImpl()); // Project info
+//    VirtualFileManager.getInstance().addVirtualFileListener(new LivetestFileListener()); // File change info
+    EditorFactory.getInstance().getEventMulticaster().addDocumentListener(new LivetestDocumentListener()); // File change info - only one working for difference
   }
 
   @Override

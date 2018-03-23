@@ -1,7 +1,10 @@
 package resources;
 
 import com.intellij.openapi.project.Project;
+import listeners.LivetestProjectManagerListenerImpl;
 import model.ChangedFile;
+
+import java.util.logging.Logger;
 
 public class DataStore {
 
@@ -9,10 +12,6 @@ public class DataStore {
 
   private Project activeProject;
   private ChangedFile lastChangedFile = new ChangedFile();
-
-  public static DataStore getInstance() {
-    return ourInstance;
-  }
 
   private DataStore() {
   }
@@ -25,16 +24,19 @@ public class DataStore {
     this.activeProject = project;
   }
 
-  public static DataStore getOurInstance() {
+  public static DataStore getInstance() {
     return ourInstance;
-  }
-
-  public static void setOurInstance(DataStore ourInstance) {
-    DataStore.ourInstance = ourInstance;
   }
 
   public ChangedFile getLastChangedFile() {
     return lastChangedFile;
   }
 
+  public void setLastChangedFile(ChangedFile lastChangedFile) {
+    this.lastChangedFile = lastChangedFile;
+  }
+
+  public void initChangedFile() {
+    this.lastChangedFile = new ChangedFile();
+  }
 }
