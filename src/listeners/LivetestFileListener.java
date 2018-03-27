@@ -24,9 +24,6 @@ public class LivetestFileListener implements VirtualFileListener {
         if (isPythonFile(event.getFile())) {
             DataStore.getInstance().initChangedFile();
             DataStore.getInstance().getLastChangedFile().setOriginalContent(getTest(event));
-//            System.out.println("beforeContentsChange file: " + getTest(event));
-//            System.out.println("NewModificationStamp: " + event.getNewModificationStamp());
-//            System.out.println("OldModificationStamp: " + event.getOldModificationStamp());
         }
     }
 
@@ -36,11 +33,6 @@ public class LivetestFileListener implements VirtualFileListener {
 
             ArrayList<FileLine> changes =
                 DataStore.getInstance().getLastChangedFile().getChangedSequences();
-//            System.out.println("beforeContentsChange file: " + getTest(event));
-//            System.out.println("File changes: ");
-//            System.out.println(changes);
-//            DataStore.getInstance().getLastChangedFile().printOrigFile();
-//            DataStore.getInstance().getLastChangedFile().pri ntModFile();
         }
     }
 

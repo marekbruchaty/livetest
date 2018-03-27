@@ -3,8 +3,7 @@ package actions;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.Messages;
-import utils.FileUtils;
+import utils.VirtualFileUtils;
 
 import java.util.logging.Logger;
 
@@ -20,7 +19,7 @@ public class PluginStatus extends AnAction {
     public void actionPerformed(AnActionEvent e) {
         LOGGER.info("Hello action activated.");
         Project project = e.getProject();
-        FileUtils.getAllProjectFiles(project);
+        VirtualFileUtils.getAllProjectFiles(project);
 //        Messages.showMessageDialog(project, "Hello world!", "Greeting", Messages.getInformationIcon());
     }
 }

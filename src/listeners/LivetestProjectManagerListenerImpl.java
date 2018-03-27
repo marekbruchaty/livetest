@@ -21,7 +21,7 @@ public class LivetestProjectManagerListenerImpl implements VetoableProjectManage
         Logger.getLogger(LivetestProjectManagerListenerImpl.class.getName());
 
     @Override public void projectOpened(Project project) {
-        log.setLevel(Level.OFF);
+//        log.setLevel(Level.INFO);
         log.info(String.format("Active project name: %s, base path: %s", project.getName(),
             project.getBasePath()));
         DataStore.getInstance().setActiveProject(project);

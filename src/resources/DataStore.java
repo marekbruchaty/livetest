@@ -1,10 +1,11 @@
 package resources;
 
 import com.intellij.openapi.project.Project;
-import listeners.LivetestProjectManagerListenerImpl;
 import model.ChangedFile;
 
-import java.util.logging.Logger;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class DataStore {
 
@@ -12,6 +13,7 @@ public class DataStore {
 
   private Project activeProject;
   private ChangedFile lastChangedFile = new ChangedFile();
+  private Map<String, List<String>> unmodifiedFiles = new HashMap<>();
 
   private DataStore() {
   }
@@ -38,5 +40,21 @@ public class DataStore {
 
   public void initChangedFile() {
     this.lastChangedFile = new ChangedFile();
+  }
+
+  public Map<String, List<String>> getUnmodifiedFiles() {
+    return unmodifiedFiles;
+  }
+
+  public void initUnmodifiedFiles() {
+    this.unmodifiedFiles = new HashMap<>();
+  }
+
+  public boolean unmodifiedFileExists(String path) {
+    return this.unmodifiedFiles.containsKey(path);
+  }
+
+  public void addUnmodifiedFile(String path, List<String> text) {
+    this.unmodifiedFiles.put(path, text);
   }
 }
