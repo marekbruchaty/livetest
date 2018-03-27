@@ -2,20 +2,16 @@ package listeners;
 
 import com.intellij.openapi.editor.event.DocumentEvent;
 import com.intellij.openapi.editor.event.DocumentListener;
-import com.intellij.openapi.editor.impl.DocumentMarkupModel;
-import com.intellij.openapi.editor.markup.MarkupModel;
 import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.util.DocumentUtil;
 import editor.Highlighter;
 import org.apache.commons.lang.StringUtils;
 import resources.DataStore;
 import resources.FileStore;
-import utils.VirtualFileUtils;
 import utils.PopupUtils;
+import utils.VirtualFileUtils;
 
 import java.util.Collections;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -42,16 +38,15 @@ public class LivetestDocumentListener implements DocumentListener {
         int offset = event.getOffset();
         int lineNumber = StringUtils.countMatches(fileContent.substring(0, offset), "\n");
 
-        MarkupModel markupModel = DocumentMarkupModel
-            .forDocument(event.getDocument(), DataStore.getInstance().getActiveProject(), true);
-
         VirtualFile virtualFile = VirtualFileUtils.getVirtualFile(event.getDocument());
+        Highlighter.highlightLine(virtualFile, event.getDocument(), lineNumber);
 
-        Highlighter.highlightLine(virtualFile, lineNumber, markupModel);
+        showInfoPopup(event, lineNumber);
+    }
 
+    private void showInfoPopup(DocumentEvent event, int lineNumber) {
         String eventDetailInfo = getEventDetailInfo(event);
-        eventDetailInfo += String.format("\nLine n.%d changed", lineNumber + 1);
-
+        eventDetailInfo += String.format("%nLine n.%d changed", lineNumber + 1);
         PopupUtils.createPopup(eventDetailInfo, MessageType.INFO);
     }
 

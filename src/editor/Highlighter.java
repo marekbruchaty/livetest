@@ -1,5 +1,7 @@
 package editor;
 
+import com.intellij.openapi.editor.Document;
+import com.intellij.openapi.editor.impl.DocumentMarkupModel;
 import com.intellij.openapi.editor.markup.MarkupModel;
 import com.intellij.openapi.editor.markup.RangeHighlighter;
 import com.intellij.openapi.editor.markup.TextAttributes;
@@ -24,12 +26,17 @@ public class Highlighter {
 
     private static final Color highlightColor = Color.DARK_GRAY;
 
-    private Highlighter() {}
+    private Highlighter() {
+    }
 
-    public static void highlightLine(VirtualFile virtualFile, int lineNumber, MarkupModel markupModel) {
+    public static void highlightLine(VirtualFile virtualFile, Document document, int lineNumber) {
+        MarkupModel markupModel = DocumentMarkupModel
+            .forDocument(document, DataStore.getInstance().getActiveProject(), true);
+
         FileEditor[] editors =
             FileEditorManager.getInstance(DataStore.getInstance().getActiveProject())
                 .getEditors(virtualFile);
+
         for (FileEditor editor : editors) {
             if (editor instanceof TextEditor) {
                 TextAttributes textAttributes = new TextAttributes();
@@ -39,26 +46,27 @@ public class Highlighter {
         }
     }
 
-    public static void removeLineHighlight(VirtualFile virtualFile, int lineNumber, MarkupModel markupModel) {
-//        FileEditor[] editors =
-//            FileEditorManager.getInstance(DataStore.getInstance().getActiveProject())
-//                .getEditors(virtualFile);
+    public static void removeLineHighlight(VirtualFile virtualFile, int lineNumber,
+        MarkupModel markupModel) {
+        //        FileEditor[] editors =
+        //            FileEditorManager.getInstance(DataStore.getInstance().getActiveProject())
+        //                .getEditors(virtualFile);
 
         Optional<RangeHighlighter> highlighters =
             Arrays.stream(markupModel.getAllHighlighters()).filter(x -> x.getLayer() == 0)
                 .findAny();
         markupModel.removeHighlighter(highlighters.get());
-//        DocumentUtil.getLineTextRange();
+        //        DocumentUtil.getLineTextRange();
 
-//        for (FileEditor editor : editors) {
-//            if (editor instanceof TextEditor) {
-//                TextAttributes textAttributes = new TextAttributes();
-//                textAttributes.setBackgroundColor(highlightColor);
-//                markupModel.addLineHighlighter(lineNumber, 0, textAttributes);
-//                markupModel.removeHighlighter();
-//
-//            }
-//        }
+        //        for (FileEditor editor : editors) {
+        //            if (editor instanceof TextEditor) {
+        //                TextAttributes textAttributes = new TextAttributes();
+        //                textAttributes.setBackgroundColor(highlightColor);
+        //                markupModel.addLineHighlighter(lineNumber, 0, textAttributes);
+        //                markupModel.removeHighlighter();
+        //
+        //            }
+        //        }
     }
 
 }
