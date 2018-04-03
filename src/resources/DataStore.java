@@ -14,6 +14,7 @@ public class DataStore {
   private Project activeProject;
   private ChangedFile lastChangedFile = new ChangedFile();
   private Map<String, List<String>> unmodifiedFiles = new HashMap<>();
+  private Map<String, List<Integer>> modifiedFiles = new HashMap<>();
 
   private DataStore() {
   }
@@ -56,5 +57,13 @@ public class DataStore {
 
   public void addUnmodifiedFile(String path, List<String> text) {
     this.unmodifiedFiles.put(path, text);
+  }
+
+  public Map<String, List<Integer>> getModifiedFiles() {
+    return modifiedFiles;
+  }
+
+  public void setModifiedFiles(Map<String, List<Integer>> modifiedFiles) {
+    this.modifiedFiles = modifiedFiles;
   }
 }

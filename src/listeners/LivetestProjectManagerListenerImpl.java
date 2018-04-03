@@ -12,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import resources.DataStore;
 
 import java.util.Collection;
-import java.util.logging.Level;
+import java.util.Objects;
 import java.util.logging.Logger;
 
 public class LivetestProjectManagerListenerImpl implements VetoableProjectManagerListener {
@@ -21,34 +21,40 @@ public class LivetestProjectManagerListenerImpl implements VetoableProjectManage
         Logger.getLogger(LivetestProjectManagerListenerImpl.class.getName());
 
     @Override public void projectOpened(Project project) {
-//        log.setLevel(Level.INFO);
         log.info(String.format("Active project name: %s, base path: %s", project.getName(),
             project.getBasePath()));
-        DataStore.getInstance().setActiveProject(project);
 
+        DataStore.getInstance().setActiveProject(project);
         initListeners(project); // Init listeners dependent on current project
 
-        Collection<VirtualFile> allProjectFiles = FileBasedIndex.getInstance()
+        log.info("Project base dir. canonical path: " + getProjectPath());
+        log.info("Project base dir. name: " + getProjectName());
+
+        logAllPyFiles();
+    }
+
+    @NotNull private String getProjectName() {
+        return DataStore.getInstance().getActiveProject().getBaseDir().getName();
+    }
+
+    private void logAllPyFiles() {
+        String fileLog = getAllProjectPyFiles().stream()
+            .filter(x -> Objects.requireNonNull(x.getCanonicalPath()).startsWith(getProjectPath()))
+            .map(x -> String.format("File name: %s,\tpath: %s\n", x.getName(), x.getCanonicalPath()))
+            .reduce("", String::concat);
+
+        log.info("All project files:\n" + fileLog);
+
+    }
+
+    private String getProjectPath() {
+        return DataStore.getInstance().getActiveProject().getBaseDir().getCanonicalPath();
+    }
+
+    private Collection<VirtualFile> getAllProjectPyFiles() {
+        return FileBasedIndex.getInstance()
             .getContainingFiles(FileTypeIndex.NAME, PythonFileType.INSTANCE,
                 GlobalSearchScope.allScope(DataStore.getInstance().getActiveProject()));
-
-        VirtualFile baseDir = DataStore.getInstance().getActiveProject().getBaseDir();
-        log.info(String.format("Project base dir: %s", baseDir.getCanonicalPath()));
-        log.info(String.format("Project base dir: %s", baseDir.getName()));
-
-        for (VirtualFile file : baseDir.getChildren()) {
-            log.info(String.format("File base dir: %s\nFile base dir: %s", file.getCanonicalPath(),
-                file.getName()));
-        }
-
-        log.info("All project files:");
-        for (VirtualFile file : allProjectFiles) {
-            if (file.getCanonicalPath().startsWith(baseDir.getCanonicalPath()) && file.getName()
-                .toLowerCase().startsWith("test")) {
-                log.info(
-                    String.format("name: %s, path: %s", file.getName(), file.getCanonicalPath()));
-            }
-        }
     }
 
     private void initListeners(Project project) {

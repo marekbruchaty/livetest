@@ -2,7 +2,8 @@ package enums;
 
 public enum LivetestErrorCode {
     NO_VIRTUAL_FILE_FOR_DOCUMENT("No virtual file found for document."),
-    NO_ACTIVE_PROJECT_FOUND("No active project found.");
+    NO_ACTIVE_PROJECT_FOUND("No active project found."),
+    NO_COVERAGE_FILE_AVAILABLE("No coverage file found on disk.");
 
     private final String message;
 

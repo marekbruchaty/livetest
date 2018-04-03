@@ -7,6 +7,8 @@ import listeners.LivetestFileListener;
 import listeners.LivetestProjectManagerListenerImpl;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.logging.Logger;
 
 public class PluginInitialization implements ApplicationComponent {

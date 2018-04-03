@@ -8,16 +8,16 @@ import com.intellij.openapi.editor.markup.TextAttributes;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.TextEditor;
-import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.ui.JBColor;
+import com.intellij.openapi.util.TextRange;
 import com.intellij.util.DocumentUtil;
-import org.bouncycastle.crypto.prng.RandomGenerator;
+import listeners.LivetestDocumentListener;
 import resources.DataStore;
+import utils.VirtualFileUtils;
 
 import java.awt.*;
 import java.util.Arrays;
-import java.util.Optional;
-import java.util.stream.Stream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Utility class with static members used to interact with the editors highlighting features
@@ -25,48 +25,61 @@ import java.util.stream.Stream;
 public class Highlighter {
 
     private static final Color highlightColor = Color.DARK_GRAY;
+    private static final Logger log = Logger.getLogger(LivetestDocumentListener.class.getName());
+    private static final int HIGHLIGHTER_LAYER = 66;
 
     private Highlighter() {
     }
 
-    public static void highlightLine(VirtualFile virtualFile, Document document, int lineNumber) {
-        MarkupModel markupModel = DocumentMarkupModel
-            .forDocument(document, DataStore.getInstance().getActiveProject(), true);
+    public static void addLineHighlight(Document document, int lineNumber) {
+        if (highlightExists(document, lineNumber)) {
+            log.log(Level.WARNING, "Highlighter for line {0} already exists!", lineNumber);
+            return;
+        }
+
+        MarkupModel markupModel = getMarkupModel(document);
 
         FileEditor[] editors =
             FileEditorManager.getInstance(DataStore.getInstance().getActiveProject())
-                .getEditors(virtualFile);
+                .getEditors(VirtualFileUtils.getVirtualFile(document));
 
         for (FileEditor editor : editors) {
             if (editor instanceof TextEditor) {
                 TextAttributes textAttributes = new TextAttributes();
                 textAttributes.setBackgroundColor(highlightColor);
-                markupModel.addLineHighlighter(lineNumber, 0, textAttributes);
+                textAttributes.setErrorStripeColor(highlightColor);
+                markupModel.addLineHighlighter(lineNumber, HIGHLIGHTER_LAYER, textAttributes);
             }
         }
     }
 
-    public static void removeLineHighlight(VirtualFile virtualFile, int lineNumber,
-        MarkupModel markupModel) {
-        //        FileEditor[] editors =
-        //            FileEditorManager.getInstance(DataStore.getInstance().getActiveProject())
-        //                .getEditors(virtualFile);
+    public static void removeLineHighlight(Document document, int lineNumber) {
+        MarkupModel markupModel = getMarkupModel(document);
 
-        Optional<RangeHighlighter> highlighters =
-            Arrays.stream(markupModel.getAllHighlighters()).filter(x -> x.getLayer() == 0)
-                .findAny();
-        markupModel.removeHighlighter(highlighters.get());
-        //        DocumentUtil.getLineTextRange();
+        TextRange lineTextRange = DocumentUtil.getLineTextRange(document, lineNumber);
 
-        //        for (FileEditor editor : editors) {
-        //            if (editor instanceof TextEditor) {
-        //                TextAttributes textAttributes = new TextAttributes();
-        //                textAttributes.setBackgroundColor(highlightColor);
-        //                markupModel.addLineHighlighter(lineNumber, 0, textAttributes);
-        //                markupModel.removeHighlighter();
-        //
-        //            }
-        //        }
+        for (RangeHighlighter highlighter : markupModel.getAllHighlighters()) {
+            if (intersectsAndMatchLayer(highlighter, lineTextRange)) {
+                markupModel.removeHighlighter(highlighter);
+            }
+        }
+    }
+
+    private static boolean intersectsAndMatchLayer(RangeHighlighter highlighter,
+        TextRange lineTextRange) {
+        return !(highlighter.getEndOffset() < lineTextRange.getStartOffset()
+            || highlighter.getStartOffset() > lineTextRange.getEndOffset())
+            && highlighter.getLayer() == HIGHLIGHTER_LAYER;
+    }
+
+    private static boolean highlightExists(Document document, int lineNumber) {
+        return Arrays.stream(getMarkupModel(document).getAllHighlighters()).anyMatch(
+            x -> intersectsAndMatchLayer(x, DocumentUtil.getLineTextRange(document, lineNumber)));
+    }
+
+    private static MarkupModel getMarkupModel(Document document) {
+        return DocumentMarkupModel
+            .forDocument(document, DataStore.getInstance().getActiveProject(), true);
     }
 
 }

@@ -1,11 +1,8 @@
 package listeners;
 
-import com.intellij.openapi.editor.Document;
-import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiTreeChangeEvent;
 import com.intellij.psi.PsiTreeChangeListener;
 import org.jetbrains.annotations.NotNull;
-import resources.DataStore;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -15,12 +12,17 @@ public class LivetestPsiTreeChangeListenerImpl implements PsiTreeChangeListener 
     private static final Logger log =
         Logger.getLogger(LivetestPsiTreeChangeListenerImpl.class.getName());
 
+    public LivetestPsiTreeChangeListenerImpl() {
+        super();
+        log.setLevel(Level.OFF);
+    }
+
     @Override public void beforeChildAddition(@NotNull PsiTreeChangeEvent psiTreeChangeEvent) {
         log.log(Level.FINE, String.format("beforeChildAddition | PsiTreeChangeEvent: %s", psiTreeChangeEvent));
-        Document document =
-            PsiDocumentManager.getInstance(DataStore.getInstance().getActiveProject())
-                .getDocument(psiTreeChangeEvent.getFile());
-        System.out.println("beforeChildAddition: " + document.getText());
+//        Document document =
+//            PsiDocumentManager.getInstance(DataStore.getInstance().getActiveProject())
+//                .getDocument(psiTreeChangeEvent.getFile());
+//        System.out.println("beforeChildAddition: " + document.getText());
 
     }
 
@@ -43,10 +45,10 @@ public class LivetestPsiTreeChangeListenerImpl implements PsiTreeChangeListener 
     @Override public void beforeChildrenChange(@NotNull PsiTreeChangeEvent psiTreeChangeEvent) {
         log.info(
             String.format("beforeChildrenChange | PsiTreeChangeEvent: %s", psiTreeChangeEvent));
-        Document document =
-            PsiDocumentManager.getInstance(DataStore.getInstance().getActiveProject())
-                .getDocument(psiTreeChangeEvent.getFile());
-        System.out.println("beforeChildrenChange: " + document.getText());
+//        Document document =
+//            PsiDocumentManager.getInstance(DataStore.getInstance().getActiveProject())
+//                .getDocument(psiTreeChangeEvent.getFile());
+//        System.out.println("beforeChildrenChange: " + document.getText());
 
     }
 

@@ -6,35 +6,33 @@ import java.util.Map;
 
 public class FileStore {
 
-  private static FileStore ourInstance = new FileStore();
+    private static FileStore ourInstance = new FileStore();
 
-  private Map<String, List<String>> unmodifiedFiles = new HashMap<>();
+    private Map<String, List<String>> unmodifiedFiles = new HashMap<>();
 
-  private FileStore() {
-  }
+    private FileStore() {
+    }
 
-  public static FileStore getInstance() {
-    return ourInstance;
-  }
+    public static FileStore getInstance() {
+        return ourInstance;
+    }
 
-  public Map<String, List<String>> getUnmodifiedFiles() {
-    return unmodifiedFiles;
-  }
+    public Map<String, List<String>> getUnmodifiedFiles() {
+        return unmodifiedFiles;
+    }
 
-  public List<String> getUnmodifiedFileText(String key) {
-    return unmodifiedFiles.get(key);
-  }
+    public void addUnmodifiedFile(String path, List<String> lines) {
+        this.unmodifiedFiles.put(path, lines);
+    }
 
-  public void initUnmodifiedFiles() {
-    this.unmodifiedFiles = new HashMap<>();
-  }
+    public boolean existsUnmodifiedFile(String path) {
+        return unmodifiedFiles.containsKey(path);
+    }
 
-  public boolean unmodifiedFileExists(String path) {
-    return this.unmodifiedFiles.containsKey(path);
-  }
-
-  public void addUnmodifiedFile(String path, List<String> text) {
-    this.unmodifiedFiles.put(path, text);
-  }
-
+    public String getUnmodifiedFile(String path, int lineIndex) {
+        List<String> lines = unmodifiedFiles.get(path);
+        if (lines == null)
+            return null;
+        return lines.get(lineIndex);
+    }
 }
