@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CoverageDataLoader {
+public class CoverageLoader {
 
     public static List<TestCaseCoverage> loadCoverageData() {
         List<String> lines;
@@ -30,4 +30,5 @@ public class CoverageDataLoader {
 
         return coverages;
     }
+
 }

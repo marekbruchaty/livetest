@@ -1,11 +1,11 @@
 package resources;
 
+import com.google.common.collect.Sets;
 import com.intellij.openapi.project.Project;
 import model.ChangedFile;
+import model.CoverageMapping;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class DataStore {
 
@@ -13,8 +13,15 @@ public class DataStore {
 
   private Project activeProject;
   private ChangedFile lastChangedFile = new ChangedFile();
+
   private Map<String, List<String>> unmodifiedFiles = new HashMap<>();
-  private Map<String, List<Integer>> modifiedFiles = new HashMap<>();
+  private Map<String, HashSet<Integer>> modifiedFiles = new HashMap<>();
+
+  private List<CoverageMapping> coverageMappings = new ArrayList<>();
+
+  public static synchronized DataStore getInstance() {
+    return ourInstance;
+  }
 
   private DataStore() {
   }
@@ -25,10 +32,6 @@ public class DataStore {
 
   public void setActiveProject(Project project) {
     this.activeProject = project;
-  }
-
-  public static DataStore getInstance() {
-    return ourInstance;
   }
 
   public ChangedFile getLastChangedFile() {
@@ -59,11 +62,25 @@ public class DataStore {
     this.unmodifiedFiles.put(path, text);
   }
 
-  public Map<String, List<Integer>> getModifiedFiles() {
+  public Map<String, HashSet<Integer>> getModifiedFiles() {
     return modifiedFiles;
   }
 
-  public void setModifiedFiles(Map<String, List<Integer>> modifiedFiles) {
-    this.modifiedFiles = modifiedFiles;
+  public void addChangedLine(String filePath, int lineNumber) {
+    if (modifiedFiles.containsKey(filePath)) {
+      modifiedFiles.get(filePath).add(lineNumber);
+    } else {
+      modifiedFiles.put(filePath, Sets.newHashSet(lineNumber));
+    }
   }
+
+  public void removeChangedLine(String filePath, int lineNumber) {
+    if (modifiedFiles.containsKey(filePath)) {
+      modifiedFiles.get(filePath).remove(lineNumber);
+      if (modifiedFiles.get(filePath).isEmpty()) {
+        modifiedFiles.remove(filePath);
+      }
+    }
+  }
+
 }

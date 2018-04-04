@@ -60,6 +60,31 @@ public class SimpleTest {
         }
     }
 
+
+    @Test void testPythonScriptExecution2() {
+        try {
+            Process p = Runtime.getRuntime().exec("pytest /work/priv/python/python-tests/tests/test_wallet_pytest.py::test_wallet_spend_cash\n");
+            InputStream inputStream = p.getInputStream();
+            InputStream errorStream = p.getErrorStream();
+
+            new InputStreamReader(inputStream);
+            new InputStreamReader(errorStream);
+
+            //            Scanner scannerInput = new Scanner(inputStream).useDelimiter("\\A");
+            //            String resultInput = scannerInput.hasNext() ? scannerInput.next() : "";
+
+            Scanner scannerError = new Scanner(inputStream).useDelimiter("\\A");
+            if (scannerError.hasNext()) {
+                String resultError = scannerError.hasNext() ? scannerError.next() : "";
+                System.out.println(resultError);
+                //TODO throw new error ...
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     @Test void testPythonScriptCheckErrors() {
         try {
             String filePath = "/work/priv/pytest-livetest/example_project/account/wallet.py";

@@ -1,14 +1,10 @@
 import com.intellij.openapi.components.ApplicationComponent;
 import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.project.ProjectManager;
-import com.intellij.openapi.vfs.VirtualFileManager;
 import listeners.LivetestDocumentListener;
-import listeners.LivetestFileListener;
 import listeners.LivetestProjectManagerListenerImpl;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.logging.Logger;
 
 public class PluginInitialization implements ApplicationComponent {
@@ -17,6 +13,11 @@ public class PluginInitialization implements ApplicationComponent {
 
     @Override public void initComponent() {
         initListeners();
+        initCoverageThread();
+    }
+
+    private void initCoverageThread() {
+        new CoverageThread().start();
     }
 
     private void initListeners() {

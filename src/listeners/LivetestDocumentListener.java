@@ -40,12 +40,14 @@ public class LivetestDocumentListener implements DocumentListener {
         }
 
         int lineNumber = getLineNumber(event.getDocument().getText(), event.getOffset());
-        String newLine = Arrays.asList(event.getDocument().getText().split("\n")).get(lineNumber);
+        String newLine = Arrays.asList(event.getDocument().getText().split("\n")).get(lineNumber).trim();
         String oldLine = FileStore.getInstance().getUnmodifiedFile(virtualFile.getPath(), lineNumber);
 
         if (oldLine.equalsIgnoreCase(newLine)) {
+            DataStore.getInstance().removeChangedLine(virtualFile.getPath(), lineNumber);
             Highlighter.removeLineHighlight(event.getDocument(), lineNumber);
         } else {
+            DataStore.getInstance().addChangedLine(virtualFile.getPath(), lineNumber);
             Highlighter.addLineHighlight(event.getDocument(), lineNumber);
         }
 
