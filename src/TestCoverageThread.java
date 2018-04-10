@@ -1,3 +1,5 @@
+import com.intellij.openapi.application.ApplicationInfo;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import resources.AppConstants;
 import resources.DataStore;
@@ -34,7 +36,9 @@ public class TestCoverageThread extends Thread {
                     PytestExecutor.runCoverageForWholeProject(
                         DataStore.getInstance().getActiveProject().getBasePath());
 
-                    FileDocumentManager.getInstance().saveAllDocuments();
+                    ApplicationManager.getApplication().invokeAndWait(
+                        () -> ApplicationManager.getApplication().runWriteAction(
+                            () -> FileDocumentManager.getInstance().saveAllDocuments()));
 
                     clearCoverageFile();
                     DataStore.getInstance().resetModifiedFiles();
