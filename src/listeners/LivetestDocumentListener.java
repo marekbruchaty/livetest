@@ -35,7 +35,7 @@ public class LivetestDocumentListener implements DocumentListener {
 
         if (!isPythonProjectFile(virtualFile)) {
             log.log(Level.INFO,
-                String.format("%s not a python file. Moving on...", virtualFile.getName()));
+                String.format("%s is and underscored file, not a python file or project file. Moving on...", virtualFile.getName()));
             return;
         }
 
@@ -49,12 +49,15 @@ public class LivetestDocumentListener implements DocumentListener {
         } else {
             DataStore.getInstance().addChangedLine(virtualFile.getPath(), lineNumber);
             Highlighter.addLineHighlight(event.getDocument(), lineNumber);
+            DataStore.getInstance().resetLastChangeTimeMillis();
         }
 
-        showInfoPopup(event, lineNumber);
+//        showInfoPopup(event, lineNumber);
     }
 
     private boolean isPythonProjectFile(VirtualFile virtualFile) {
+        System.out.println(virtualFile.getPath());
+        System.out.println(virtualFile.getName());
         return virtualFile.getPath().startsWith(
             Objects.requireNonNull(DataStore.getInstance().getActiveProject().getBasePath()))
             && virtualFile.getName().toLowerCase().endsWith(".py") && !virtualFile.getName()

@@ -9,6 +9,7 @@ import java.util.*;
 
 public class DataStore {
 
+  public static final int TIME_DELAY = 3000;
   private static DataStore ourInstance = new DataStore();
 
   private Project activeProject;
@@ -16,6 +17,7 @@ public class DataStore {
 
   private Map<String, List<String>> unmodifiedFiles = new HashMap<>();
   private Map<String, HashSet<Integer>> modifiedFiles = new HashMap<>();
+  private long lastChangeTimeMillis = 0;
 
   private List<CoverageMapping> coverageMappings = new ArrayList<>();
 
@@ -66,6 +68,10 @@ public class DataStore {
     return modifiedFiles;
   }
 
+  public Map<String, HashSet<Integer>> resetModifiedFiles() {
+    return modifiedFiles =  new HashMap<>();
+  }
+
   public void addChangedLine(String filePath, int lineNumber) {
     if (modifiedFiles.containsKey(filePath)) {
       modifiedFiles.get(filePath).add(lineNumber);
@@ -81,6 +87,22 @@ public class DataStore {
         modifiedFiles.remove(filePath);
       }
     }
+  }
+
+  public long getLastChangeTimeMillis() {
+    return lastChangeTimeMillis;
+  }
+
+  public void setLastChangeTimeMillis(long lastChangeTimeMillis) {
+    this.lastChangeTimeMillis = lastChangeTimeMillis;
+  }
+
+  public void resetLastChangeTimeMillis() {
+    this.lastChangeTimeMillis = System.currentTimeMillis();
+  }
+
+  public boolean delayElapsed() {
+    return System.currentTimeMillis() + TIME_DELAY > lastChangeTimeMillis;
   }
 
 }

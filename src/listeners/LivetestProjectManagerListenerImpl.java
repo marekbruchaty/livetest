@@ -13,6 +13,7 @@ import resources.DataStore;
 
 import java.util.Collection;
 import java.util.Objects;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class LivetestProjectManagerListenerImpl implements VetoableProjectManagerListener {
@@ -43,8 +44,7 @@ public class LivetestProjectManagerListenerImpl implements VetoableProjectManage
             .map(x -> String.format("File name: %s,\tpath: %s\n", x.getName(), x.getCanonicalPath()))
             .reduce("", String::concat);
 
-        log.info("All project files:\n" + fileLog);
-
+        log.log(Level.INFO, "All project files: {0}\n", fileLog);
     }
 
     private String getProjectPath() {

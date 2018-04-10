@@ -17,7 +17,7 @@ public class PluginInitialization implements ApplicationComponent {
     }
 
     private void initCoverageThread() {
-        new CoverageThread().start();
+        new TestCoverageThread().start();
     }
 
     private void initListeners() {

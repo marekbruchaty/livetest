@@ -18,20 +18,20 @@ public class VirtualFileUtils {
     private VirtualFileUtils() {
     }
 
-    private static final Logger LOGGER = Logger.getLogger(VirtualFileUtils.class.getName());
+    private static final Logger log = Logger.getLogger(VirtualFileUtils.class.getName());
 
     public static void getAllProjectFiles(Project project) {
-        LOGGER.info("Base directory: " + project.getBaseDir());
+        log.info("Base directory: " + project.getBaseDir());
 
         VirtualFile[] children = project.getProjectFile().getChildren();
-        LOGGER.info("Number of children: " + children.length);
+        log.info("Number of children: " + children.length);
 
         Collection<VirtualFile> files =
             FileTypeIndex.getFiles(PythonFileType.INSTANCE, GlobalSearchScope.allScope(project));
 
-        LOGGER.info(() -> "Number of files in project: " + files.size());
+        log.info(() -> "Number of files in project: " + files.size());
         for (VirtualFile f : files) {
-            LOGGER.info("file name: " + f.getName());
+            log.info("file name: " + f.getName());
         }
     }
 
