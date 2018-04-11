@@ -1,13 +1,18 @@
-import com.intellij.openapi.application.ApplicationInfo;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
+import editor.Highlighter;
+import model.CoverageMapping;
+import model.TestCaseCoverage;
 import resources.AppConstants;
+import resources.CoverageLoader;
 import resources.DataStore;
+import subproc.PytestExecutor;
 import utils.VirtualFileUtils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Level;
@@ -33,12 +38,34 @@ public class TestCoverageThread extends Thread {
                 if (DataStore.getInstance().delayElapsed() && !DataStore.getInstance()
                     .getModifiedFiles().isEmpty()) {
                     logger.info("executing coverage");
-                    PytestExecutor.runCoverageForWholeProject(
-                        DataStore.getInstance().getActiveProject().getBasePath());
 
                     ApplicationManager.getApplication().invokeAndWait(
                         () -> ApplicationManager.getApplication().runWriteAction(
                             () -> FileDocumentManager.getInstance().saveAllDocuments()));
+
+                    PytestExecutor.runCoverageForWholeProject(
+                        DataStore.getInstance().getActiveProject().getBasePath());
+
+                    List<TestCaseCoverage> coverageList = CoverageLoader.loadCoverageData();
+
+                    for (TestCaseCoverage coverage : coverageList) {
+                        String testName = coverage.getTestName();
+                        System.out.println("Test name: " + testName);
+
+                        for (CoverageMapping coverageMap : coverage.getCoverageMappings()) {
+                            String fileName = coverageMap.getFileName();
+                            List<Integer> coveredLines = coverageMap.getCoveredLines();
+                            System.out.println("File name: " + fileName);
+                            System.out.println("Covered lines: " + coveredLines);
+                            ApplicationManager.getApplication().invokeAndWait(
+                                () -> ApplicationManager.getApplication().runWriteAction(
+                                    () -> Highlighter.addLineHighlight(fileName, coveredLines,
+                                        Highlighter.HighlightType.INFO, false,
+                                        "Covered by: " + testName)));
+                            //                            Highlighter.addLineHighlight(fileName, coveredLines);
+                        }
+                    }
+
 
                     clearCoverageFile();
                     DataStore.getInstance().resetModifiedFiles();

@@ -34,25 +34,30 @@ public class LivetestDocumentListener implements DocumentListener {
         VirtualFile virtualFile = VirtualFileUtils.getVirtualFile(event.getDocument());
 
         if (!isPythonProjectFile(virtualFile)) {
-            log.log(Level.INFO,
-                String.format("%s is and underscored file, not a python file or project file. Moving on...", virtualFile.getName()));
+            log.log(Level.INFO, String.format(
+                "%s is and underscored file, not a python file or project file. Moving on...",
+                virtualFile.getName()));
             return;
         }
 
         int lineNumber = getLineNumber(event.getDocument().getText(), event.getOffset());
-        String newLine = Arrays.asList(event.getDocument().getText().split("\n")).get(lineNumber).trim();
-        String oldLine = FileStore.getInstance().getUnmodifiedFile(virtualFile.getPath(), lineNumber);
+        String newLine =
+            Arrays.asList(event.getDocument().getText().split("\n")).get(lineNumber).trim();
+        String oldLine =
+            FileStore.getInstance().getUnmodifiedFile(virtualFile.getPath(), lineNumber);
 
         if (oldLine.equalsIgnoreCase(newLine)) {
             DataStore.getInstance().removeChangedLine(virtualFile.getPath(), lineNumber);
             Highlighter.removeLineHighlight(event.getDocument(), lineNumber);
         } else {
             DataStore.getInstance().addChangedLine(virtualFile.getPath(), lineNumber);
-            Highlighter.addLineHighlight(event.getDocument(), lineNumber);
+            Highlighter
+                .addLineHighlight(event.getDocument(), lineNumber, Highlighter.HighlightType.MOD,
+                    false, "This is a modified line.");
             DataStore.getInstance().resetLastChangeTimeMillis();
         }
 
-//        showInfoPopup(event, lineNumber);
+        //        showInfoPopup(event, lineNumber);
     }
 
     private boolean isPythonProjectFile(VirtualFile virtualFile) {

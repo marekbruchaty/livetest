@@ -10,9 +10,9 @@ public class LivetestIcons {
     }
 
     public static class GutterIcons {
-        public static final Icon Info = IconLoader.getIcon("/icons/gutter/livetestInfo.png");
-        public static final Icon Pass = IconLoader.getIcon("/icons/gutter/livetestPass.png");
-        public static final Icon Fail = IconLoader.getIcon("/icons/gutter/livetestFail.png");
+        public static final Icon INFO = IconLoader.getIcon("/icons/gutter/livetestInfo.png");
+        public static final Icon PASS = IconLoader.getIcon("/icons/gutter/livetestPass.png");
+        public static final Icon FAIL = IconLoader.getIcon("/icons/gutter/livetestFail.png");
 
         public GutterIcons() {
         }

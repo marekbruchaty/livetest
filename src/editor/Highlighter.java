@@ -1,15 +1,19 @@
 package editor;
 
+import colors.LivetestColors;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.impl.DocumentMarkupModel;
 import com.intellij.openapi.editor.markup.GutterIconRenderer;
 import com.intellij.openapi.editor.markup.MarkupModel;
 import com.intellij.openapi.editor.markup.RangeHighlighter;
 import com.intellij.openapi.editor.markup.TextAttributes;
+import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.TextEditor;
 import com.intellij.openapi.util.TextRange;
+import com.intellij.openapi.vfs.LocalFileSystem;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.DocumentUtil;
 import icons.LivetestIcons;
 import listeners.LivetestDocumentListener;
@@ -29,14 +33,31 @@ import java.util.logging.Logger;
  */
 public class Highlighter {
 
-    private static final Color highlightColor = Color.DARK_GRAY;
     private static final Logger log = Logger.getLogger(LivetestDocumentListener.class.getName());
     private static final int HIGHLIGHTER_LAYER = 66;
 
     private Highlighter() {
     }
 
-    public static void addLineHighlight(Document document, int lineNumber) {
+    private static Color highlightColor = null;
+    private static Icon highlightIcon = null;
+
+
+    public enum HighlightType {
+        INFO, PASS, FAIL, MOD
+    }
+
+    public static void addLineHighlight(String filePath, Iterable<Integer> lines,
+        HighlightType type, boolean fill, String tooltipText) {
+        VirtualFile virtualFile = LocalFileSystem.getInstance().findFileByPath(filePath);
+        Document document = FileDocumentManager.getInstance().getDocument(virtualFile);
+        for (int line : lines) {
+            addLineHighlight(document, line - 1, type, fill, tooltipText);
+        }
+    }
+
+    public static void addLineHighlight(Document document, int lineNumber, HighlightType type,
+        boolean fill, String tooltipText) {
         if (highlightExists(document, lineNumber)) {
             log.log(Level.WARNING, "Highlighter for line {0} already exists!", lineNumber);
             return;
@@ -48,21 +69,45 @@ public class Highlighter {
             FileEditorManager.getInstance(DataStore.getInstance().getActiveProject())
                 .getEditors(VirtualFileUtils.getVirtualFile(document));
 
+        initLineColor(type, fill);
+
         for (FileEditor editor : editors) {
             if (editor instanceof TextEditor) {
-                TextAttributes textAttributes = new TextAttributes();
-                textAttributes.setBackgroundColor(highlightColor);
-                textAttributes.setErrorStripeColor(highlightColor);
+
+                TextAttributes textAttributes = null;
+                if (highlightColor != null) {
+                    textAttributes = new TextAttributes();
+                    textAttributes.setBackgroundColor(highlightColor);
+                    textAttributes.setErrorStripeColor(highlightColor);
+                }
+
                 RangeHighlighter highlighter =
                     markupModel.addLineHighlighter(lineNumber, HIGHLIGHTER_LAYER, textAttributes);
 
-                addGutterIcon(highlighter, LivetestIcons.GutterIcons.Info);
-
+                if (highlightIcon != null) {
+                    addGutterIcon(highlighter, highlightIcon, tooltipText);
+                }
             }
         }
     }
 
-    private static void addGutterIcon(RangeHighlighter highlighter, Icon icon) {
+    private static void initLineColor(HighlightType type, boolean fill) {
+        if (type == HighlightType.INFO) {
+            highlightIcon = LivetestIcons.GutterIcons.INFO;
+            highlightColor = null;
+        } else if (type == HighlightType.MOD) {
+            highlightIcon = null;
+            highlightColor = LivetestColors.HighlightColors.INFO;
+        } else if (type == HighlightType.PASS) {
+            highlightIcon = LivetestIcons.GutterIcons.PASS;
+            highlightColor = null;
+        } else if (type == HighlightType.FAIL) {
+            highlightIcon = LivetestIcons.GutterIcons.FAIL;
+            highlightColor = null;
+        }
+    }
+
+    private static void addGutterIcon(RangeHighlighter highlighter, Icon icon, String tooltipText) {
         highlighter.setGutterIconRenderer(new GutterIconRenderer() {
 
             @Override public boolean equals(Object o) {
@@ -78,7 +123,7 @@ public class Highlighter {
             }
 
             @Nullable @Override public String getTooltipText() {
-                return "Cool, it works!";
+                return tooltipText;
             }
         });
     }
