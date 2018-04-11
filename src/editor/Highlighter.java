@@ -25,7 +25,7 @@ import utils.VirtualFileUtils;
 import javax.swing.*;
 import java.awt.*;
 import java.util.Arrays;
-import java.util.logging.Level;
+import java.util.Optional;
 import java.util.logging.Logger;
 
 /**
@@ -58,10 +58,6 @@ public class Highlighter {
 
     public static void addLineHighlight(Document document, int lineNumber, HighlightType type,
         boolean fill, String tooltipText) {
-        if (highlightExists(document, lineNumber)) {
-            log.log(Level.WARNING, "Highlighter for line {0} already exists!", lineNumber);
-            return;
-        }
 
         MarkupModel markupModel = getMarkupModel(document);
 
@@ -69,7 +65,7 @@ public class Highlighter {
             FileEditorManager.getInstance(DataStore.getInstance().getActiveProject())
                 .getEditors(VirtualFileUtils.getVirtualFile(document));
 
-        initLineColor(type, fill);
+        initLineColor(type);
 
         for (FileEditor editor : editors) {
             if (editor instanceof TextEditor) {
@@ -81,8 +77,21 @@ public class Highlighter {
                     textAttributes.setErrorStripeColor(highlightColor);
                 }
 
-                RangeHighlighter highlighter =
-                    markupModel.addLineHighlighter(lineNumber, HIGHLIGHTER_LAYER, textAttributes);
+                RangeHighlighter highlighter;
+
+                Optional<RangeHighlighter> existingHighlight =
+                    getExistingHighlight(document, lineNumber);
+                if (existingHighlight.isPresent()) {
+                    highlighter = existingHighlight.get();
+                    if (highlighter.getGutterIconRenderer() != null && tooltipText != null && !highlighter.getGutterIconRenderer()
+                        .getTooltipText().contains(tooltipText)) {
+                        tooltipText = tooltipText + "\n" + highlighter.getGutterIconRenderer()
+                            .getTooltipText();
+                    }
+                } else {
+                    highlighter = markupModel
+                        .addLineHighlighter(lineNumber, HIGHLIGHTER_LAYER, textAttributes);
+                }
 
                 if (highlightIcon != null) {
                     addGutterIcon(highlighter, highlightIcon, tooltipText);
@@ -91,7 +100,7 @@ public class Highlighter {
         }
     }
 
-    private static void initLineColor(HighlightType type, boolean fill) {
+    private static void initLineColor(HighlightType type) {
         if (type == HighlightType.INFO) {
             highlightIcon = LivetestIcons.GutterIcons.INFO;
             highlightColor = null;
@@ -150,6 +159,13 @@ public class Highlighter {
     private static boolean highlightExists(Document document, int lineNumber) {
         return Arrays.stream(getMarkupModel(document).getAllHighlighters()).anyMatch(
             x -> intersectsAndMatchLayer(x, DocumentUtil.getLineTextRange(document, lineNumber)));
+    }
+
+    private static Optional<RangeHighlighter> getExistingHighlight(Document document,
+        int lineNumber) {
+        return Arrays.stream(getMarkupModel(document).getAllHighlighters()).filter(
+            x -> intersectsAndMatchLayer(x, DocumentUtil.getLineTextRange(document, lineNumber)))
+            .findFirst();
     }
 
     private static MarkupModel getMarkupModel(Document document) {

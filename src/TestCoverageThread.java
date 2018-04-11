@@ -1,5 +1,10 @@
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
+import com.intellij.openapi.vfs.LocalFileSystem;
+import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.psi.PsiDocumentManager;
+import com.intellij.psi.PsiFile;
 import editor.Highlighter;
 import model.CoverageMapping;
 import model.TestCaseCoverage;
@@ -9,6 +14,7 @@ import resources.DataStore;
 import subproc.PytestExecutor;
 import utils.VirtualFileUtils;
 
+import javax.xml.crypto.Data;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
@@ -46,12 +52,25 @@ public class TestCoverageThread extends Thread {
                         () -> ApplicationManager.getApplication().runWriteAction(
                             () -> FileDocumentManager.getInstance().saveAllDocuments()));
 
+
+                    //
+                    //                    String filePath = "";
+                    //                    VirtualFile virtualFile = LocalFileSystem.getInstance().findFileByPath(filePath);
+                    //                    Document document = FileDocumentManager.getInstance().getDocument(virtualFile);
+                    //                    PsiFile psiFile =
+                    //                        PsiDocumentManager.getInstance(DataStore.getInstance().getActiveProject())
+                    //                            .getPsiFile(document);
+
+
+
                     // Run coverage for the whole project
                     PytestExecutor.runCoverageForWholeProject(
                         DataStore.getInstance().getActiveProject().getBasePath());
 
                     // Load coverage data to memory
                     List<TestCaseCoverage> coverageList = CoverageLoader.loadCoverageData();
+
+
 
                     // Add coverage highlighters to gutter
                     for (TestCaseCoverage coverage : coverageList) {
