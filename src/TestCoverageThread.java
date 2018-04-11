@@ -35,19 +35,25 @@ public class TestCoverageThread extends Thread {
         TimerTask timerTask = new TimerTask() {
 
             @Override public void run() {
+
+
                 if (DataStore.getInstance().delayElapsed() && !DataStore.getInstance()
                     .getModifiedFiles().isEmpty()) {
-                    logger.info("executing coverage");
+                    logger.info("Running coverage task");
 
+                    // Force save all files in project
                     ApplicationManager.getApplication().invokeAndWait(
                         () -> ApplicationManager.getApplication().runWriteAction(
                             () -> FileDocumentManager.getInstance().saveAllDocuments()));
 
+                    // Run coverage for the whole project
                     PytestExecutor.runCoverageForWholeProject(
                         DataStore.getInstance().getActiveProject().getBasePath());
 
+                    // Load coverage data to memory
                     List<TestCaseCoverage> coverageList = CoverageLoader.loadCoverageData();
 
+                    // Add coverage highlighters to gutter
                     for (TestCaseCoverage coverage : coverageList) {
                         String testName = coverage.getTestName();
                         System.out.println("Test name: " + testName);
@@ -57,16 +63,17 @@ public class TestCoverageThread extends Thread {
                             List<Integer> coveredLines = coverageMap.getCoveredLines();
                             System.out.println("File name: " + fileName);
                             System.out.println("Covered lines: " + coveredLines);
+
+                            // Cannot interact with the editor from background thread
                             ApplicationManager.getApplication().invokeAndWait(
                                 () -> ApplicationManager.getApplication().runWriteAction(
                                     () -> Highlighter.addLineHighlight(fileName, coveredLines,
                                         Highlighter.HighlightType.INFO, false,
                                         "Covered by: " + testName)));
-                            //                            Highlighter.addLineHighlight(fileName, coveredLines);
                         }
                     }
 
-
+                    // clear coverage file and code modification records from memory
                     clearCoverageFile();
                     DataStore.getInstance().resetModifiedFiles();
                 }

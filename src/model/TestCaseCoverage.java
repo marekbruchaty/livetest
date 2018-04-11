@@ -2,7 +2,10 @@ package model;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class TestCaseCoverage {
 
@@ -28,5 +31,13 @@ public class TestCaseCoverage {
 
     public void setCoverageMappings(List<CoverageMapping> coverageMappings) {
         this.coverageMappings = coverageMappings;
+    }
+
+    public List<Integer> getCoverageForFile(String fileName) {
+        Optional<CoverageMapping> result =
+            coverageMappings.stream().filter(x -> x.getFileName().equalsIgnoreCase(fileName))
+                .findFirst();
+
+        return result.isPresent() ? result.get().getCoveredLines() : Collections.emptyList();
     }
 }

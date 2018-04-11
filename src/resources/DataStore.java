@@ -9,100 +9,141 @@ import java.util.*;
 
 public class DataStore {
 
-  public static final int TIME_DELAY = 3000;
-  private static DataStore ourInstance = new DataStore();
+    private static final int TIME_DELAY = 3000;
+    private static DataStore ourInstance = new DataStore();
 
-  private Project activeProject;
-  private ChangedFile lastChangedFile = new ChangedFile();
+    // Current active project
+    private Project activeProject;
 
-  private Map<String, List<String>> unmodifiedFiles = new HashMap<>();
-  private Map<String, HashSet<Integer>> modifiedFiles = new HashMap<>();
-  private long lastChangeTimeMillis = 0;
+    // Last file modified by user
+    private ChangedFile lastChangedFile = new ChangedFile();
 
-  private List<CoverageMapping> coverageMappings = new ArrayList<>();
+    // Original file state used for change detection
+    private Map<String, List<String>> unmodifiedFiles = new HashMap<>();
 
-  public static synchronized DataStore getInstance() {
-    return ourInstance;
-  }
+    // Modified files used to execute used for test selection
+    private Map<String, HashSet<Integer>> modifiedFiles = new HashMap<>();
 
-  private DataStore() {
-  }
+    // Timestamp of last source code change in editor
+    private long lastChangeTimeMillis = 0;
 
-  public Project getActiveProject() {
-    return activeProject;
-  }
+    // Coverage information obtained from pytest
+    private List<CoverageMapping> coverageMappings = new ArrayList<>();
 
-  public void setActiveProject(Project project) {
-    this.activeProject = project;
-  }
-
-  public ChangedFile getLastChangedFile() {
-    return lastChangedFile;
-  }
-
-  public void setLastChangedFile(ChangedFile lastChangedFile) {
-    this.lastChangedFile = lastChangedFile;
-  }
-
-  public void initChangedFile() {
-    this.lastChangedFile = new ChangedFile();
-  }
-
-  public Map<String, List<String>> getUnmodifiedFiles() {
-    return unmodifiedFiles;
-  }
-
-  public void initUnmodifiedFiles() {
-    this.unmodifiedFiles = new HashMap<>();
-  }
-
-  public boolean unmodifiedFileExists(String path) {
-    return this.unmodifiedFiles.containsKey(path);
-  }
-
-  public void addUnmodifiedFile(String path, List<String> text) {
-    this.unmodifiedFiles.put(path, text);
-  }
-
-  public Map<String, HashSet<Integer>> getModifiedFiles() {
-    return modifiedFiles;
-  }
-
-  public Map<String, HashSet<Integer>> resetModifiedFiles() {
-    return modifiedFiles =  new HashMap<>();
-  }
-
-  public void addChangedLine(String filePath, int lineNumber) {
-    if (modifiedFiles.containsKey(filePath)) {
-      modifiedFiles.get(filePath).add(lineNumber);
-    } else {
-      modifiedFiles.put(filePath, Sets.newHashSet(lineNumber));
+    public static synchronized DataStore getInstance() {
+        return ourInstance;
     }
-  }
 
-  public void removeChangedLine(String filePath, int lineNumber) {
-    if (modifiedFiles.containsKey(filePath)) {
-      modifiedFiles.get(filePath).remove(lineNumber);
-      if (modifiedFiles.get(filePath).isEmpty()) {
-        modifiedFiles.remove(filePath);
-      }
+
+    private DataStore() {
     }
-  }
 
-  public long getLastChangeTimeMillis() {
-    return lastChangeTimeMillis;
-  }
 
-  public void setLastChangeTimeMillis(long lastChangeTimeMillis) {
-    this.lastChangeTimeMillis = lastChangeTimeMillis;
-  }
+    /*
+    * Active project
+    * */
+    public Project getActiveProject() {
+        return activeProject;
+    }
 
-  public void resetLastChangeTimeMillis() {
-    this.lastChangeTimeMillis = System.currentTimeMillis();
-  }
+    public void setActiveProject(Project project) {
+        this.activeProject = project;
+    }
 
-  public boolean delayElapsed() {
-    return System.currentTimeMillis() + TIME_DELAY > lastChangeTimeMillis;
-  }
 
+    /*
+    * Last changed file
+    * */
+    public ChangedFile getLastChangedFile() {
+        return lastChangedFile;
+    }
+
+    public void setLastChangedFile(ChangedFile lastChangedFile) {
+        this.lastChangedFile = lastChangedFile;
+    }
+
+    public void initChangedFile() {
+        this.lastChangedFile = new ChangedFile();
+    }
+
+
+    /*
+    * Unmodified files
+    * */
+    public Map<String, List<String>> getUnmodifiedFiles() {
+        return unmodifiedFiles;
+    }
+
+    public void initUnmodifiedFiles() {
+        this.unmodifiedFiles = new HashMap<>();
+    }
+
+    public boolean unmodifiedFileExists(String path) {
+        return this.unmodifiedFiles.containsKey(path);
+    }
+
+    public void addUnmodifiedFile(String path, List<String> text) {
+        this.unmodifiedFiles.put(path, text);
+    }
+
+
+    /*
+    * Modified files
+    * */
+    public Map<String, HashSet<Integer>> getModifiedFiles() {
+        return modifiedFiles;
+    }
+
+    public Map<String, HashSet<Integer>> resetModifiedFiles() {
+        return modifiedFiles = new HashMap<>();
+    }
+
+    public void addChangedLine(String filePath, int lineNumber) {
+        if (modifiedFiles.containsKey(filePath)) {
+            modifiedFiles.get(filePath).add(lineNumber);
+        } else {
+            modifiedFiles.put(filePath, Sets.newHashSet(lineNumber));
+        }
+    }
+
+    public void removeChangedLine(String filePath, int lineNumber) {
+        if (modifiedFiles.containsKey(filePath)) {
+            modifiedFiles.get(filePath).remove(lineNumber);
+            if (modifiedFiles.get(filePath).isEmpty()) {
+                modifiedFiles.remove(filePath);
+            }
+        }
+    }
+
+
+    /*
+    * Change timestamp
+    * */
+    public long getLastChangeTimeMillis() {
+        return lastChangeTimeMillis;
+    }
+
+    public void setLastChangeTimeMillis(long lastChangeTimeMillis) {
+        this.lastChangeTimeMillis = lastChangeTimeMillis;
+    }
+
+    public void resetLastChangeTimeMillis() {
+        this.lastChangeTimeMillis = System.currentTimeMillis();
+    }
+
+    public boolean delayElapsed() {
+        return System.currentTimeMillis() + TIME_DELAY > lastChangeTimeMillis;
+    }
+
+
+    /*
+    * Coverage mapping
+    * */
+    public List<CoverageMapping> getCoverageMappings() {
+        return coverageMappings;
+    }
+
+    public void setCoverageMappings(List<CoverageMapping> coverageMappings) {
+        this.coverageMappings = coverageMappings;
+    }
 }
