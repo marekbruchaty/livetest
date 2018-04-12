@@ -28,18 +28,13 @@ public class PytestExecutor {
      *
      * @param projectFilePath projects root path
      */
-    public static void runCoverageForWholeProject(String projectFilePath) {
+    public static String runCoverageForWholeProject(String projectFilePath) {
         Process process = execProcess("pytest -v " + projectFilePath  + " --tb=no");
-        String stdInput = getStdInput(process);
         String stdError = getStdError(process);
-//        System.out.println(stdInput);
-//        System.out.println(stdError);
-
-        List<String> collect = Arrays.stream(stdInput.split("\n")).filter(x -> x.contains("::"))
-            .collect(Collectors.toList());
-        for (String s : collect) {
-            System.out.println(s);
-        }
+        String stdInput = getStdInput(process);
+        //        System.out.println(stdInput);
+        //        System.out.println(stdError);
+        return stdInput;
     }
 
     /**
