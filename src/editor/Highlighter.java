@@ -1,6 +1,5 @@
 package editor;
 
-import colors.LivetestColors;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.impl.DocumentMarkupModel;
 import com.intellij.openapi.editor.markup.GutterIconRenderer;
@@ -44,20 +43,25 @@ public class Highlighter {
 
 
     public enum HighlightType {
-        INFO, PASS, FAIL, MOD
+        INFO, EDIT, PASS, FAIL
     }
 
     public static void addLineHighlight(String filePath, Iterable<Integer> lines,
-        HighlightType type, boolean fill, String tooltipText) {
+        HighlightType type, String tooltipText) {
         VirtualFile virtualFile = LocalFileSystem.getInstance().findFileByPath(filePath);
         Document document = FileDocumentManager.getInstance().getDocument(virtualFile);
         for (int line : lines) {
-            addLineHighlight(document, line - 1, type, fill, tooltipText);
+            addLineHighlight(document, line - 1, type, tooltipText);
         }
     }
 
-    public static void addLineHighlight(Document document, int lineNumber, HighlightType type,
-        boolean fill, String tooltipText) {
+    public static void addLineHighlight(String filePath, Integer line, HighlightType type, String tooltipText) {
+        VirtualFile virtualFile = LocalFileSystem.getInstance().findFileByPath(filePath);
+        Document document = FileDocumentManager.getInstance().getDocument(virtualFile);
+        addLineHighlight(document, line - 1, type, tooltipText);
+    }
+
+    public static void addLineHighlight(Document document, int lineNumber, HighlightType type, String tooltipText) {
 
         MarkupModel markupModel = getMarkupModel(document);
 
@@ -83,11 +87,6 @@ public class Highlighter {
                     getExistingHighlight(document, lineNumber);
                 if (existingHighlight.isPresent()) {
                     highlighter = existingHighlight.get();
-                    if (highlighter.getGutterIconRenderer() != null && tooltipText != null && !highlighter.getGutterIconRenderer()
-                        .getTooltipText().contains(tooltipText)) {
-                        tooltipText = tooltipText + "\n" + highlighter.getGutterIconRenderer()
-                            .getTooltipText();
-                    }
                 } else {
                     highlighter = markupModel
                         .addLineHighlighter(lineNumber, HIGHLIGHTER_LAYER, textAttributes);
@@ -104,9 +103,11 @@ public class Highlighter {
         if (type == HighlightType.INFO) {
             highlightIcon = LivetestIcons.GutterIcons.INFO;
             highlightColor = null;
-        } else if (type == HighlightType.MOD) {
-            highlightIcon = null;
-            highlightColor = LivetestColors.HighlightColors.INFO;
+        } else if (type == HighlightType.EDIT) {
+//            highlightIcon = null;
+//            highlightColor = LivetestColors.HighlightColors.INFO;
+            highlightIcon = LivetestIcons.GutterIcons.EDIT;
+            highlightColor = null;
         } else if (type == HighlightType.PASS) {
             highlightIcon = LivetestIcons.GutterIcons.PASS;
             highlightColor = null;

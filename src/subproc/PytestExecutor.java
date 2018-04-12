@@ -7,6 +7,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 import java.util.logging.Level;
@@ -28,11 +29,17 @@ public class PytestExecutor {
      * @param projectFilePath projects root path
      */
     public static void runCoverageForWholeProject(String projectFilePath) {
-        Process process = execProcess("pytest " + projectFilePath);
+        Process process = execProcess("pytest -v " + projectFilePath  + " --tb=no");
         String stdInput = getStdInput(process);
         String stdError = getStdError(process);
-        System.out.println(stdInput);
-        System.out.println(stdError);
+//        System.out.println(stdInput);
+//        System.out.println(stdError);
+
+        List<String> collect = Arrays.stream(stdInput.split("\n")).filter(x -> x.contains("::"))
+            .collect(Collectors.toList());
+        for (String s : collect) {
+            System.out.println(s);
+        }
     }
 
     /**
@@ -56,12 +63,18 @@ public class PytestExecutor {
         }
     }
 
-    public static boolean checkPythonFileSyntax(String filePath) {
+    public static boolean isFileSyntaxOk(String filePath) {
         try {
-            execProcess("python -m py_compile " + filePath);
+            Process p = Runtime.getRuntime().exec("python -m py_compile "  + filePath);
+            Scanner scannerError = new Scanner(p.getErrorStream()).useDelimiter("\\A");
+
+            if (scannerError.hasNext()) {
+                String resultError = scannerError.hasNext() ? scannerError.next() : null;
+                return resultError == null;
+            }
             return true;
-        } catch (LivetestException e) {
-            log.log(Level.INFO, "File {0} syntax error. Moving on...", filePath);
+
+        } catch (IOException e) {
             return false;
         }
     }

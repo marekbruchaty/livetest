@@ -11,6 +11,7 @@ public class LivetestIcons {
 
     public static class GutterIcons {
         public static final Icon INFO = IconLoader.getIcon("/icons/gutter/livetestInfo.png");
+        public static final Icon EDIT = IconLoader.getIcon("/icons/gutter/livetestEdit.png");
         public static final Icon PASS = IconLoader.getIcon("/icons/gutter/livetestPass.png");
         public static final Icon FAIL = IconLoader.getIcon("/icons/gutter/livetestFail.png");
 

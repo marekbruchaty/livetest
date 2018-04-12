@@ -19,6 +19,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -87,7 +90,7 @@ public class SimpleTest {
 
     @Test void testPythonScriptCheckErrors() {
         try {
-            String filePath = "/work/priv/pytest-livetest/example_project/account/wallet.py";
+            String filePath = "/work/priv/python/python-tests/account/wallet.py";
             Process p = Runtime.getRuntime().exec("python -m py_compile "  + filePath);
 
             InputStream errorStream = p.getErrorStream();

@@ -4,8 +4,11 @@ import com.google.common.collect.Sets;
 import com.intellij.openapi.project.Project;
 import model.ChangedFile;
 import model.CoverageMapping;
+import model.coverage.CovFile;
+import model.coverage.CovTest;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class DataStore {
 
@@ -29,6 +32,9 @@ public class DataStore {
 
     // Coverage information obtained from pytest
     private List<CoverageMapping> coverageMappings = new ArrayList<>();
+
+    private Map<String, CovFile> covFiles = new HashMap<>();
+    private Map<String, CovTest> covTests = new HashMap<>();
 
     public static synchronized DataStore getInstance() {
         return ourInstance;
@@ -90,12 +96,12 @@ public class DataStore {
     /*
     * Modified files
     * */
-    public Map<String, HashSet<Integer>> getModifiedFiles() {
-        return modifiedFiles;
+    public Set<String> getModifiedFiles() {
+        return modifiedFiles.keySet();
     }
 
     public Map<String, HashSet<Integer>> resetModifiedFiles() {
-        return modifiedFiles = new HashMap<>();
+        return this.modifiedFiles = new HashMap<>();
     }
 
     public void addChangedLine(String filePath, int lineNumber) {
@@ -145,5 +151,57 @@ public class DataStore {
 
     public void setCoverageMappings(List<CoverageMapping> coverageMappings) {
         this.coverageMappings = coverageMappings;
+    }
+
+
+    /*
+    * Source code files with coverage
+    * */
+    public List<String> getCovFileNames() {
+        return covFiles.values().stream().map(CovFile::getName).collect(Collectors.toList());
+    }
+
+    public CovFile getCovFile(String fileName) {
+        return covFiles.get(fileName);
+    }
+
+    public void putCovFile(CovFile covFile) {
+        this.covFiles.put(covFile.getName(), covFile);
+    }
+
+    public void resetCovFiles() {
+        this.covFiles = new HashMap<>();
+    }
+
+    public boolean isEmptyCovFiles() {
+        return covFiles.isEmpty();
+    }
+
+    public boolean existsCovFile(String fileName) {
+        return covFiles.containsKey(fileName);
+    }
+
+
+    /*
+     * Tests with coverage
+     * */
+    public CovTest getCovTest(String testName) {
+        return covTests.get(testName);
+    }
+
+    public void addCovTest(CovTest covTest) {
+        this.covTests.put(covTest.getName(), covTest);
+    }
+
+    public void resetCovTests() {
+        this.covTests = new HashMap<>();
+    }
+
+    public boolean isEmptyCovTests() {
+        return covTests.isEmpty();
+    }
+
+    public boolean existsCovTest(String testName) {
+        return covTests.containsKey(testName);
     }
 }

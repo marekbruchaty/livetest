@@ -51,10 +51,10 @@ public class LivetestDocumentListener implements DocumentListener {
             Highlighter.removeLineHighlight(event.getDocument(), lineNumber);
         } else {
             DataStore.getInstance().addChangedLine(virtualFile.getPath(), lineNumber);
-            Highlighter
-                .addLineHighlight(event.getDocument(), lineNumber, Highlighter.HighlightType.MOD,
-                    false, "This is a modified line.");
             DataStore.getInstance().resetLastChangeTimeMillis();
+            Highlighter
+                .addLineHighlight(event.getDocument(), lineNumber, Highlighter.HighlightType.EDIT,
+                    "This is a modified line.");
         }
 
         //        showInfoPopup(event, lineNumber);
