@@ -31,6 +31,7 @@ public class TestCoverageThread extends Thread {
     @Override public void run() {
         super.run();
 
+        // Wait for project to load
         whileProjectNotReady();
 
         TimerTask timerTask = new TimerTask() {

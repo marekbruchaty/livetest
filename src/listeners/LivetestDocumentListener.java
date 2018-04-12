@@ -52,7 +52,7 @@ public class LivetestDocumentListener implements DocumentListener {
             DataStore.getInstance().resetLastChangeTimeMillis();
             Highlighter
                 .addLineHighlight(event.getDocument(), lineNumber, Highlighter.HighlightType.EDIT,
-                    "This is a modified line.");
+                    "Line changed");
         }
     }
 
@@ -65,12 +65,5 @@ public class LivetestDocumentListener implements DocumentListener {
 
     private int getLineNumber(String fileContent, int offset) {
         return StringUtils.countMatches(fileContent.substring(0, offset), "\n");
-    }
-
-    private String getEventDetailInfo(DocumentEvent event) {
-        return "\nevent.getNewLength(): " + event.getNewLength() + "\nevent.getNewFragment(): "
-            + event.getNewFragment() + "\nevent.getOldLength(): " + event.getOldLength()
-            + "\nevent.getOldFragment(): " + event.getOldFragment() + "\nevent.getOffset(): "
-            + event.getOffset();
     }
 }
