@@ -5,11 +5,9 @@ import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileEvent;
 import com.intellij.openapi.vfs.VirtualFileListener;
-import model.FileLine;
 import org.jetbrains.annotations.NotNull;
 import resources.DataStore;
 
-import java.util.ArrayList;
 import java.util.logging.Logger;
 
 public class LivetestFileListener implements VirtualFileListener {
@@ -30,9 +28,6 @@ public class LivetestFileListener implements VirtualFileListener {
     @Override public void contentsChanged(@NotNull VirtualFileEvent event) {
         if (isPythonFile(event.getFile())) {
             DataStore.getInstance().getLastChangedFile().setModifiedContent(getTest(event));
-
-            ArrayList<FileLine> changes =
-                DataStore.getInstance().getLastChangedFile().getChangedSequences();
         }
     }
 

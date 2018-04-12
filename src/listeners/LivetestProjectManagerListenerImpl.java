@@ -10,7 +10,6 @@ import com.intellij.util.indexing.FileBasedIndex;
 import com.jetbrains.python.PythonFileType;
 import org.jetbrains.annotations.NotNull;
 import resources.DataStore;
-import subproc.PytestExecutor;
 
 import java.util.Collection;
 import java.util.Objects;

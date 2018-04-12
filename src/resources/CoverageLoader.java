@@ -10,18 +10,20 @@ import model.coverage.CovLine;
 import model.coverage.CovTest;
 import utils.FileUtils;
 
-import javax.xml.crypto.Data;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class CoverageLoader {
 
+    private CoverageLoader() {
+    }
+
     public static void loadAndSaveCoverageData() {
         saveCoverageToDataStore(loadCoverageData());
     }
 
-    public static List<TestCaseCoverage> loadCoverageData() {
+    private static List<TestCaseCoverage> loadCoverageData() {
         List<String> lines;
         try {
             lines = FileUtils.readLines(DataStore.getInstance().getActiveProject().getBasePath()

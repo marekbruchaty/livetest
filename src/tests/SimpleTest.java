@@ -4,27 +4,17 @@ package tests;
 import com.google.gson.Gson;
 import enums.LivetestErrorCode;
 import exceptions.LivetestException;
-import model.CoverageMapping;
 import model.TestCaseCoverage;
 import org.apache.commons.lang.StringUtils;
-import org.apache.xmlbeans.impl.xb.ltgfmt.TestCase;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import resources.DataStore;
 import utils.FileUtils;
 
-import javax.xml.bind.SchemaOutputResolver;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Scanner;
 
 public class SimpleTest {
@@ -132,9 +122,6 @@ public class SimpleTest {
     @Test void testCoverageInfoReady() {
         List<String> lines;
         try {
-//            lines = FileUtils.readLines(
-//                DataStore.getInstance().getActiveProject().getBasePath()
-//                    + "/.livetest-coverage.json");
             lines = FileUtils.readLines("/work/priv/python/python-tests/.livetest-coverage.json");
         } catch (IOException e) {
             throw new LivetestException(LivetestErrorCode.NO_COVERAGE_FILE_AVAILABLE);

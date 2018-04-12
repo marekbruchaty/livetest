@@ -5,23 +5,18 @@ import exceptions.LivetestException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 public class PytestExecutor {
 
-    private static final Logger log = Logger.getLogger(PytestExecutor.class.getName());
-
-    public boolean checkDependencies() {
-        Process process = execProcess("pytest -h\n");
-        return process != null && checkOutputForErrors(process);
+    private PytestExecutor() {
     }
+
+    private static final Logger log = Logger.getLogger(PytestExecutor.class.getName());
 
     /**
      * Executes all projects test cases
@@ -30,11 +25,7 @@ public class PytestExecutor {
      */
     public static String runCoverageForWholeProject(String projectFilePath) {
         Process process = execProcess("pytest -v " + projectFilePath  + " --tb=no");
-        String stdError = getStdError(process);
-        String stdInput = getStdInput(process);
-        //        System.out.println(stdInput);
-        //        System.out.println(stdError);
-        return stdInput;
+        return getStdInput(process) + "\n" + getStdError(process);
     }
 
     /**
@@ -42,9 +33,9 @@ public class PytestExecutor {
      *
      * @param testCaseUrl format -> filePath::module::testCase
      */
-    public static void runCoverageForTestCase(String testCaseUrl) {
-        Process process = execProcess("pytest " + testCaseUrl);
-
+    public static String runCoverageForTestCase(String testCaseUrl) {
+        Process process = execProcess("pytest -v " + testCaseUrl  + " --tb=no");
+        return getStdInput(process) + "\n" + getStdError(process);
     }
 
     /**
@@ -72,11 +63,6 @@ public class PytestExecutor {
         } catch (IOException e) {
             return false;
         }
-    }
-
-    private static boolean checkOutputForErrors(Process process) {
-        InputStream errorStream = process.getErrorStream();
-        return new Scanner(errorStream).hasNext();
     }
 
     private static Process execProcess(String command) {

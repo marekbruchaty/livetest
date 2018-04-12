@@ -2,13 +2,11 @@ package listeners;
 
 import com.intellij.openapi.editor.event.DocumentEvent;
 import com.intellij.openapi.editor.event.DocumentListener;
-import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.vfs.VirtualFile;
 import editor.Highlighter;
 import org.apache.commons.lang.StringUtils;
 import resources.DataStore;
 import resources.FileStore;
-import utils.PopupUtils;
 import utils.VirtualFileUtils;
 
 import java.util.Arrays;
@@ -56,13 +54,9 @@ public class LivetestDocumentListener implements DocumentListener {
                 .addLineHighlight(event.getDocument(), lineNumber, Highlighter.HighlightType.EDIT,
                     "This is a modified line.");
         }
-
-        //        showInfoPopup(event, lineNumber);
     }
 
     private boolean isPythonProjectFile(VirtualFile virtualFile) {
-        System.out.println(virtualFile.getPath());
-        System.out.println(virtualFile.getName());
         return virtualFile.getPath().startsWith(
             Objects.requireNonNull(DataStore.getInstance().getActiveProject().getBasePath()))
             && virtualFile.getName().toLowerCase().endsWith(".py") && !virtualFile.getName()
@@ -71,12 +65,6 @@ public class LivetestDocumentListener implements DocumentListener {
 
     private int getLineNumber(String fileContent, int offset) {
         return StringUtils.countMatches(fileContent.substring(0, offset), "\n");
-    }
-
-    private void showInfoPopup(DocumentEvent event, int lineNumber) {
-        String eventDetailInfo = getEventDetailInfo(event);
-        eventDetailInfo += String.format("%nLine n.%d changed", lineNumber + 1);
-        PopupUtils.createPopup(eventDetailInfo, MessageType.INFO);
     }
 
     private String getEventDetailInfo(DocumentEvent event) {

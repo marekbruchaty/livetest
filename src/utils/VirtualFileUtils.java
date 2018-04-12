@@ -11,6 +11,7 @@ import enums.LivetestErrorCode;
 import exceptions.LivetestException;
 
 import java.util.Collection;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class VirtualFileUtils {
@@ -18,20 +19,20 @@ public class VirtualFileUtils {
     private VirtualFileUtils() {
     }
 
-    private static final Logger log = Logger.getLogger(VirtualFileUtils.class.getName());
+    private static final Logger logger = Logger.getLogger(VirtualFileUtils.class.getName());
 
     public static void getAllProjectFiles(Project project) {
-        log.info("Base directory: " + project.getBaseDir());
+        logger.log(Level.INFO,"Base directory: {0}", project.getBaseDir());
 
         VirtualFile[] children = project.getProjectFile().getChildren();
-        log.info("Number of children: " + children.length);
+        logger.log(Level.INFO, "Number of children: {0}", children.length);
 
         Collection<VirtualFile> files =
             FileTypeIndex.getFiles(PythonFileType.INSTANCE, GlobalSearchScope.allScope(project));
 
-        log.info(() -> "Number of files in project: " + files.size());
+        logger.log(Level.INFO, "Number of files in project: {0}", files.size());
         for (VirtualFile f : files) {
-            log.info("file name: " + f.getName());
+            logger.log(Level.INFO,"file name: {0}", f.getName());
         }
     }
 

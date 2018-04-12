@@ -62,6 +62,7 @@ public class TestCoverageThread extends Thread {
 
                     // clear coverage file and code modification records from memory
                     cleanUp();
+
                     initialRun = false;
                 }
             }

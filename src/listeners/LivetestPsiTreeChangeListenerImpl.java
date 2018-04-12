@@ -12,7 +12,7 @@ public class LivetestPsiTreeChangeListenerImpl implements PsiTreeChangeListener 
     private static final Logger log =
         Logger.getLogger(LivetestPsiTreeChangeListenerImpl.class.getName());
 
-    public LivetestPsiTreeChangeListenerImpl() {
+    LivetestPsiTreeChangeListenerImpl() {
         super();
         log.setLevel(Level.OFF);
     }
