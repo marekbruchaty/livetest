@@ -8,7 +8,6 @@ import resources.CoverageLoader;
 import resources.DataStore;
 import subproc.PytestExecutor;
 import subproc.PytestReportProcesor;
-import utils.VirtualFileUtils;
 
 import java.util.*;
 import java.util.logging.Level;
@@ -17,8 +16,8 @@ import java.util.stream.Collectors;
 
 public class TestCoverageThread extends Thread {
 
-    private static final int PERIOD = 3000; // Wait 3 sec. between checks
-    private static final Logger logger = Logger.getLogger(VirtualFileUtils.class.getName());
+    private static final int PERIOD = 3000; // Wait 3 sec. between check
+    private static final Logger LOGGER = Logger.getLogger(TestCoverageThread.class.getName());
     private DataStore ds = DataStore.getInstance();
     private boolean initialRun = true;
 
@@ -37,7 +36,7 @@ public class TestCoverageThread extends Thread {
             @Override public void run() {
                 if (initialRun || (DataStore.getInstance().delayElapsed() && !ds.getModifiedFiles()
                     .isEmpty())) {
-                    logger.info("Running coverage task");
+                    LOGGER.log(Level.INFO,"Running coverage task");
 
                     // Force save all files in project
                     safeAllFiles();
@@ -66,31 +65,35 @@ public class TestCoverageThread extends Thread {
             }
 
             private void runTestsForChanges() {
-                logger.log(Level.INFO, "Running coverage for changed lines covered by test suite");
+                LOGGER.log(Level.INFO, "Running coverage for changed lines covered by test suite only");
                 for (String modFileName : ds.getModifiedFiles()) {
                     CovFile covFile = ds.getCovFile(modFileName);
 
-                    logger.log(Level.FINEST, "File {0} modified. These tests need to be retested.", covFile.getName());
+                    LOGGER.log(Level.INFO, "File {0} modified. These tests need to be reruned",
+                        covFile.getName());
 
                     for (Integer lineNumber : ds.getChangedLines(modFileName)) {
                         CovLine covLine = covFile.getCovLine(lineNumber);
                         Set<String> tests = covLine.getTests();
 
                         for (String testName : tests) {
-                            PytestExecutor.runCoverageForTestCase("", testName);
+                            CovTest covTest = ds.getCovTest(testName);
+                            LOGGER.log(Level.INFO, "Reruning testcase {0}", testName);
+                            String report = PytestExecutor
+                                .runCoverageForTestCase(covTest.getFilePath(), testName);
+                            LOGGER.log(Level.INFO, "Rerun report: {0}", report);
                         }
                     }
                 }
             }
 
             private void runCoverageForWholeProject() {
-                logger.log(Level.INFO, "Running coverage for whole project");
+                LOGGER.log(Level.INFO, "Running coverage for whole project");
                 // Run coverage for the whole project
                 String report = PytestExecutor.runCoverageForWholeProject(
                     DataStore.getInstance().getActiveProject().getBasePath());
 
-                Map<String, String> testMap =
-                    PytestReportProcesor.getTestNamePathMapping(report);
+                Map<String, String> testMap = PytestReportProcesor.getTestNamePathMapping(report);
 
                 // Load coverage data to memory
                 CoverageLoader.loadAndSaveCoverageData(testMap);
@@ -100,14 +103,14 @@ public class TestCoverageThread extends Thread {
             }
 
             private void safeAllFiles() {
-                logger.log(Level.INFO, "Saving all project files");
+                LOGGER.log(Level.INFO, "Saving all project files");
                 ApplicationManager.getApplication().invokeAndWait(
                     () -> ApplicationManager.getApplication().runWriteAction(
                         () -> FileDocumentManager.getInstance().saveAllDocuments()));
             }
 
             private boolean isSyntaxOk() {
-                logger.log(Level.INFO, "Checking file syntax");
+                LOGGER.log(Level.INFO, "Checking file syntax");
                 for (String fileName : ds.getModifiedFiles()) {
                     if (!PytestExecutor.isFileSyntaxOk(fileName)) {
                         return false;
@@ -117,17 +120,17 @@ public class TestCoverageThread extends Thread {
             }
 
             private void cleanUp() {
-                logger.log(Level.INFO, "Cleaning metadata");
+                LOGGER.log(Level.INFO, "Cleaning metadata");
                 ds.resetModifiedFiles();
             }
 
             private void updateHighlights() {
-                logger.log(Level.INFO, "Updating highlights and gutter icons");
+                LOGGER.log(Level.INFO, "Updating highlights and gutter icons");
                 for (String fileName : ds.getCovFileNames()) {
                     CovFile covFile = ds.getCovFile(fileName);
 
-                    logger.log(Level.FINEST, "Source code file: {0}", fileName);
-                    logger.log(Level.FINEST, "Covered lines: {0}", covFile.getLineNumbers());
+                    LOGGER.log(Level.INFO, "Source code file: {0}", fileName);
+                    LOGGER.log(Level.INFO, "Covered lines: {0}", covFile.getLineNumbers());
 
                     for (Integer lineNumber : covFile.getLineNumbers()) {
                         CovLine covLine = covFile.getCovLine(lineNumber);
@@ -182,7 +185,7 @@ public class TestCoverageThread extends Thread {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
                 new TestCoverageThread().start();
-                logger.log(Level.SEVERE, "Thread {0} interrupted forcefully. Thread restarted.",
+                LOGGER.log(Level.SEVERE, "Thread {0} interrupted forcefully. Thread restarted.",
                     Thread.currentThread().getName());
                 Thread.currentThread().interrupt();
             }
@@ -190,7 +193,9 @@ public class TestCoverageThread extends Thread {
     }
 
     @Override public synchronized void start() {
-        logger.info(getName() + "Starting. Coverage run set to " + PERIOD / 1000 + "sec period.");
+        LOGGER.log(Level.INFO,
+            "Thread " + getName() + " starting. Coverage run set to " + (PERIOD / 1000)
+                + " second period", getName());
         super.start();
     }
 

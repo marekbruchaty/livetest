@@ -31,11 +31,11 @@ public class PytestExecutor {
     /**
      * Executes test code coverage for specific test case
      *
-     * @param testFileName format -> test file
+     * @param testFilePath format -> test file
      * @param testCaseName format -> test case name
      */
-    public static String runCoverageForTestCase(String testFileName, String testCaseName) {
-        Process process = execProcess("pytest -v " + testFileName + "::" + testCaseName  + " --tb=no");
+    public static String runCoverageForTestCase(String testFilePath, String testCaseName) {
+        Process process = execProcess("pytest -v " + testFilePath + "::" + testCaseName  + " --tb=no");
         return getStdInput(process) + "\n" + getStdError(process);
     }
 
