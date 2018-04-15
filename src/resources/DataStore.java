@@ -112,6 +112,10 @@ public class DataStore {
         }
     }
 
+    public Set<Integer> getChangedLines(String fileName) {
+        return modifiedFiles.get(fileName);
+    }
+
     public void removeChangedLine(String filePath, int lineNumber) {
         if (modifiedFiles.containsKey(filePath)) {
             modifiedFiles.get(filePath).remove(lineNumber);

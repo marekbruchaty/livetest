@@ -31,10 +31,11 @@ public class PytestExecutor {
     /**
      * Executes test code coverage for specific test case
      *
-     * @param testCaseUrl format -> filePath::module::testCase
+     * @param testFileName format -> test file
+     * @param testCaseName format -> test case name
      */
-    public static String runCoverageForTestCase(String testCaseUrl) {
-        Process process = execProcess("pytest -v " + testCaseUrl  + " --tb=no");
+    public static String runCoverageForTestCase(String testFileName, String testCaseName) {
+        Process process = execProcess("pytest -v " + testFileName + "::" + testCaseName  + " --tb=no");
         return getStdInput(process) + "\n" + getStdError(process);
     }
 
@@ -70,6 +71,7 @@ public class PytestExecutor {
         try {
             process = Runtime.getRuntime().exec(command);
         } catch (IOException e) {
+            e.printStackTrace();
             process = null;
         }
 

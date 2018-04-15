@@ -2,12 +2,12 @@ package model.coverage;
 
 public class CovTest {
     private String name;
-    private String url;
+    private String filePath;
     private boolean passing;
 
-    public CovTest(String name, boolean passing) {
+    public CovTest(String name) {
         this.name = name;
-        this.url = null;
+        this.filePath = null;
         this.passing = false;
     }
 
@@ -19,15 +19,15 @@ public class CovTest {
         this.name = name;
     }
 
-    public String getUrl() {
-        return url;
+    public String getFilePath() {
+        return filePath;
     }
 
-    public void setUrl(String url) {
-        this.url = url;
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
     }
 
-    public boolean passing() {
+    public boolean isPassing() {
         return passing;
     }
 

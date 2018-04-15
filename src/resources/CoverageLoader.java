@@ -26,8 +26,9 @@ public class CoverageLoader {
     private static List<TestCaseCoverage> loadCoverageData() {
         List<String> lines;
         try {
-            lines = FileUtils.readLines(DataStore.getInstance().getActiveProject().getBasePath()
-                + "/" + AppConstants.COVERAGE_FILE_NAME);
+            lines = FileUtils.readLines(
+                DataStore.getInstance().getActiveProject().getBasePath() + "/"
+                    + AppConstants.COVERAGE_FILE_NAME);
         } catch (IOException e) {
             throw new LivetestException(LivetestErrorCode.NO_COVERAGE_FILE_AVAILABLE);
         }
@@ -48,10 +49,12 @@ public class CoverageLoader {
             String testName = coverage.getTestName();
 
             if (!ds.existsCovTest(testName)) {
-                ds.addCovTest(new CovTest(testName, true));
+                ds.addCovTest(new CovTest(testName));
             }
 
-            ds.getCovTest(testName).setPassing(true);
+            CovTest covTest = ds.getCovTest(testName);
+            covTest.setPassing(true);
+            covTest.setFilePath(""); //TODO Set filePath from extracted from stdout
 
             for (CoverageMapping coverageMapping : coverage.getCoverageMappings()) {
                 String fileName = coverageMapping.getFileName();
@@ -72,10 +75,7 @@ public class CoverageLoader {
                     CovLine covLine = covFile.getCovLine(lineNumber);
                     covLine.addTest(testName);
                 }
-
-
             }
-
         }
     }
 

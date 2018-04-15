@@ -9,10 +9,7 @@ import resources.DataStore;
 import subproc.PytestExecutor;
 import utils.VirtualFileUtils;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -48,15 +45,14 @@ public class TestCoverageThread extends Thread {
                     if (!isSyntaxOk())
                         return;
 
-                    // Run coverage for the whole project
-                    String results = PytestExecutor.runCoverageForWholeProject(
-                        DataStore.getInstance().getActiveProject().getBasePath());
+                    // Run tests for changes covered by tests
+                    if (!initialRun)
+                        runTestsForChanges();
 
-                    // Load coverage data to memory
-                    CoverageLoader.loadAndSaveCoverageData();
+                    // Run initial testing and coverage for whole project
+                    if (initialRun)
+                        runCoverageForWholeProject();
 
-                    // Update test results - if tests passed or failed
-                    updateTestResults(results);
 
                     // Update visible highlighters
                     updateHighlights();
@@ -68,28 +64,68 @@ public class TestCoverageThread extends Thread {
                 }
             }
 
+            private void runTestsForChanges() {
+                logger.log(Level.INFO, "Running coverage for changed lines covered by test suite");
+                for (String modFileName : ds.getModifiedFiles()) {
+                    CovFile covFile = ds.getCovFile(modFileName);
+
+                    System.out.println("File " + covFile.getName()
+                        + " modified. These tests need to be retested: \n");
+
+                    for (Integer lineNumber : ds.getChangedLines(modFileName)) {
+                        CovLine covLine = covFile.getCovLine(lineNumber);
+                        Set<String> tests = covLine.getTests();
+
+                        for (String testName : tests) {
+                            System.out.println("Test: " + testName);
+                            PytestExecutor.runCoverageForTestCase("", testName);
+                        }
+                    }
+                }
+            }
+
+            private void runCoverageForWholeProject() {
+                logger.log(Level.INFO, "Running coverage for whole project");
+                // Run coverage for the whole project
+                String results = PytestExecutor.runCoverageForWholeProject(
+                    DataStore.getInstance().getActiveProject().getBasePath());
+
+                // Load coverage data to memory
+                CoverageLoader.loadAndSaveCoverageData();
+
+                //TODO Extract files and filenames and set them to DS
+
+
+                // Update test results - if tests passed or failed
+                updateTestResults(results);
+            }
+
             private void safeAllFiles() {
+                logger.log(Level.INFO, "Saving all project files");
                 ApplicationManager.getApplication().invokeAndWait(
                     () -> ApplicationManager.getApplication().runWriteAction(
                         () -> FileDocumentManager.getInstance().saveAllDocuments()));
             }
 
             private boolean isSyntaxOk() {
+                logger.log(Level.INFO, "Checking file syntax");
                 for (String fileName : ds.getModifiedFiles()) {
-                    if (PytestExecutor.isFileSyntaxOk(fileName)) {
-                        return true;
+                    if (!PytestExecutor.isFileSyntaxOk(fileName)) {
+                        return false;
                     }
                 }
-                return false;
+                return true;
             }
 
             private void cleanUp() {
+                logger.log(Level.INFO, "Cleaning metadata");
                 ds.resetModifiedFiles();
-                ds.resetCovFiles();
-                ds.resetCovTests();
+//                ds.resetCovFiles();
+//                ds.resetCovTests();
             }
 
             private void updateHighlights() {
+                logger.log(Level.INFO, "Updating highlights and gutter icons");
                 for (String fileName : ds.getCovFileNames()) {
                     CovFile covFile = ds.getCovFile(fileName);
 
@@ -106,7 +142,7 @@ public class TestCoverageThread extends Thread {
                         for (String testName : covLine.getTests()) {
                             CovTest covTest = ds.getCovTest(testName);
                             sb.append(covTest.getName()).append(" - ");
-                            if (covTest.passing()) {
+                            if (covTest.isPassing()) {
                                 sb.append("passing\n");
                             } else {
                                 hType = Highlighter.HighlightType.FAIL;

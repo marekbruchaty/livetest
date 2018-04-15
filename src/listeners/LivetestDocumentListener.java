@@ -4,6 +4,7 @@ import com.intellij.openapi.editor.event.DocumentEvent;
 import com.intellij.openapi.editor.event.DocumentListener;
 import com.intellij.openapi.vfs.VirtualFile;
 import editor.Highlighter;
+import model.coverage.CovFile;
 import org.apache.commons.lang.StringUtils;
 import resources.DataStore;
 import resources.FileStore;
@@ -46,7 +47,12 @@ public class LivetestDocumentListener implements DocumentListener {
 
         if (oldLine.equalsIgnoreCase(newLine)) {
             DataStore.getInstance().removeChangedLine(virtualFile.getPath(), lineNumber);
-            Highlighter.removeLineHighlight(event.getDocument(), lineNumber);
+            CovFile covFile = DataStore.getInstance().getCovFile(virtualFile.getPath());
+
+            if (!covFile.existsCovLine(lineNumber)) {
+                Highlighter.removeLineHighlight(event.getDocument(), lineNumber);
+            }
+
         } else {
             DataStore.getInstance().addChangedLine(virtualFile.getPath(), lineNumber);
             DataStore.getInstance().resetLastChangeTimeMillis();
