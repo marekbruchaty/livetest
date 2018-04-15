@@ -14,47 +14,14 @@ import utils.FileUtils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Scanner;
 
 public class SimpleTest {
 
-    @Test public void test() {
-        ArrayList<String> list = new ArrayList<>();
-        list.add("foo");
-        list.add("bar");
-
-        Assertions.assertTrue(list.contains("foo"));
-    }
-
     @Test void testPythonScriptExecution() {
-        try {
-            //            Process p = Runtime.getRuntime().exec("pytest /work/priv/python/python-tests");
-            Process p = Runtime.getRuntime().exec(
-                "pytest /work/priv/python/python-tests/tests/test_wallet_pytest.py::test_wallet_add_cash");
-            InputStream inputStream = p.getInputStream();
-            InputStream errorStream = p.getErrorStream();
-
-            new InputStreamReader(inputStream);
-            new InputStreamReader(errorStream);
-
-            //            Scanner scannerInput = new Scanner(inputStream).useDelimiter("\\A");
-            //            String resultInput = scannerInput.hasNext() ? scannerInput.next() : "";
-
-            Scanner scannerError = new Scanner(inputStream).useDelimiter("\\A");
-            if (scannerError.hasNext()) {
-                String resultError = scannerError.hasNext() ? scannerError.next() : "";
-                System.out.println(resultError);
-                //TODO throw new error ...
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-
-    @Test void testPythonScriptExecution2() {
         try {
             Process p = Runtime.getRuntime().exec(
                 "pytest /work/priv/python/python-tests/tests/test_wallet_pytest.py::test_wallet_spend_cash\n");
@@ -71,7 +38,6 @@ public class SimpleTest {
             if (scannerError.hasNext()) {
                 String resultError = scannerError.hasNext() ? scannerError.next() : "";
                 System.out.println(resultError);
-                //TODO throw new error ...
             }
 
         } catch (IOException e) {
@@ -91,7 +57,6 @@ public class SimpleTest {
             if (scannerError.hasNext()) {
                 String resultError = scannerError.hasNext() ? scannerError.next() : "";
                 System.out.println(resultError);
-                //TODO throw new error ...
             }
 
         } catch (IOException e) {

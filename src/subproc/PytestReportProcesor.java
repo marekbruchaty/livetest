@@ -9,7 +9,8 @@ public class PytestReportProcesor {
     private static final String ERROR = "ERROR";
     private static final String PASSED = "PASSED";
     private static final String DOUBLE_DASH_DELIMITER = "::";
-    private static final String SLASH = "/"; //TODO Determine by OS
+    //TODO determine slash type by actual OS
+    private static final String SLASH = "/";
     private static final String STEP_BACK = "..";
 
     private PytestReportProcesor() {

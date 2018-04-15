@@ -7,6 +7,7 @@ import model.coverage.CovTest;
 import resources.CoverageLoader;
 import resources.DataStore;
 import subproc.PytestExecutor;
+import subproc.PytestReportProcesor;
 import utils.VirtualFileUtils;
 
 import java.util.*;
@@ -69,15 +70,13 @@ public class TestCoverageThread extends Thread {
                 for (String modFileName : ds.getModifiedFiles()) {
                     CovFile covFile = ds.getCovFile(modFileName);
 
-                    System.out.println("File " + covFile.getName()
-                        + " modified. These tests need to be retested: \n");
+                    logger.log(Level.FINEST, "File {0} modified. These tests need to be retested.", covFile.getName());
 
                     for (Integer lineNumber : ds.getChangedLines(modFileName)) {
                         CovLine covLine = covFile.getCovLine(lineNumber);
                         Set<String> tests = covLine.getTests();
 
                         for (String testName : tests) {
-                            System.out.println("Test: " + testName);
                             PytestExecutor.runCoverageForTestCase("", testName);
                         }
                     }
@@ -87,17 +86,17 @@ public class TestCoverageThread extends Thread {
             private void runCoverageForWholeProject() {
                 logger.log(Level.INFO, "Running coverage for whole project");
                 // Run coverage for the whole project
-                String results = PytestExecutor.runCoverageForWholeProject(
+                String report = PytestExecutor.runCoverageForWholeProject(
                     DataStore.getInstance().getActiveProject().getBasePath());
 
+                Map<String, String> testMap =
+                    PytestReportProcesor.getTestNamePathMapping(report);
+
                 // Load coverage data to memory
-                CoverageLoader.loadAndSaveCoverageData();
-
-                //TODO Extract files and filenames and set them to DS
-
+                CoverageLoader.loadAndSaveCoverageData(testMap);
 
                 // Update test results - if tests passed or failed
-                updateTestResults(results);
+                updateTestResults(report);
             }
 
             private void safeAllFiles() {
@@ -120,8 +119,6 @@ public class TestCoverageThread extends Thread {
             private void cleanUp() {
                 logger.log(Level.INFO, "Cleaning metadata");
                 ds.resetModifiedFiles();
-//                ds.resetCovFiles();
-//                ds.resetCovTests();
             }
 
             private void updateHighlights() {
@@ -129,8 +126,8 @@ public class TestCoverageThread extends Thread {
                 for (String fileName : ds.getCovFileNames()) {
                     CovFile covFile = ds.getCovFile(fileName);
 
-                    System.out.println("Source code file: " + fileName);
-                    System.out.println("Covered lines: " + covFile.getLineNumbers());
+                    logger.log(Level.FINEST, "Source code file: {0}", fileName);
+                    logger.log(Level.FINEST, "Covered lines: {0}", covFile.getLineNumbers());
 
                     for (Integer lineNumber : covFile.getLineNumbers()) {
                         CovLine covLine = covFile.getCovLine(lineNumber);

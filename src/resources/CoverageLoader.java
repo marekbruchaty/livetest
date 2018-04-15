@@ -13,14 +13,15 @@ import utils.FileUtils;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class CoverageLoader {
 
     private CoverageLoader() {
     }
 
-    public static void loadAndSaveCoverageData() {
-        saveCoverageToDataStore(loadCoverageData());
+    public static void loadAndSaveCoverageData(Map<String, String> testMap) {
+        saveCoverageToDataStore(loadCoverageData(), testMap);
     }
 
     private static List<TestCaseCoverage> loadCoverageData() {
@@ -43,7 +44,8 @@ public class CoverageLoader {
         return coverages;
     }
 
-    private static void saveCoverageToDataStore(List<TestCaseCoverage> coverages) {
+    private static void saveCoverageToDataStore(List<TestCaseCoverage> coverages,
+        Map<String, String> testMap) {
         DataStore ds = DataStore.getInstance();
         for (TestCaseCoverage coverage : coverages) {
             String testName = coverage.getTestName();
@@ -54,7 +56,7 @@ public class CoverageLoader {
 
             CovTest covTest = ds.getCovTest(testName);
             covTest.setPassing(true);
-            covTest.setFilePath(""); //TODO Set filePath from extracted from stdout
+            covTest.setFilePath(testMap.get(testName));
 
             for (CoverageMapping coverageMapping : coverage.getCoverageMappings()) {
                 String fileName = coverageMapping.getFileName();
