@@ -170,16 +170,16 @@ public class TestCoverageTask {
 
                 Highlighter.HighlightType finalHType = hType;
 
-                boolean colorOverlay = false;
+                boolean isLineModified = false;
                 HashSet<Integer> modifiedLines = ds.getModifiedFiles().get(fileName);
                 if (modifiedLines != null ) {
-                    colorOverlay = modifiedLines.contains(lineNumber - 1);
+                    isLineModified = modifiedLines.contains(lineNumber - 1);
                 }
 
-                boolean finalColorOverlay = colorOverlay;
+                boolean isLineModifiedFinal = isLineModified;
                 ApplicationManager.getApplication().invokeAndWait(() -> ApplicationManager.getApplication()
                     .runWriteAction(
-                         () -> Highlighter.addLineHighlight(fileName, lineNumber, finalHType, finalColorOverlay, sb.toString())));
+                         () -> Highlighter.addLineHighlight(fileName, lineNumber, finalHType, isLineModifiedFinal, sb.toString())));
             }
         }
     }

@@ -50,19 +50,19 @@ public class Highlighter {
     }
 
 
-    public static void addLineHighlight(String filePath, Integer lineNumber, HighlightType type, boolean colorOverlay,
+    public static void addLineHighlight(String filePath, Integer lineNumber, HighlightType type, boolean isModifiedLine,
         String tooltipText) {
         VirtualFile virtualFile = LocalFileSystem.getInstance().findFileByPath(filePath);
         if (virtualFile != null) {
             LOGGER.log(Level.INFO, "Adding highlighter for line number " + lineNumber + ", file " + filePath);
-            addLineHighlight(FileDocumentManager.getInstance().getDocument(virtualFile), lineNumber - 1, type, colorOverlay,
+            addLineHighlight(FileDocumentManager.getInstance().getDocument(virtualFile), lineNumber - 1, type, isModifiedLine,
                 tooltipText);
         } else {
             LOGGER.log(Level.SEVERE, "Cannot find VirtualFile while creating highlighter!");
         }
     }
 
-    public static void addLineHighlight(Document document, int lineNumber, HighlightType type, boolean colorOverlay,
+    public static void addLineHighlight(Document document, int lineNumber, HighlightType type, boolean isModifiedLine,
         String tooltipText) {
 
         MarkupModel markupModel = getMarkupModel(document);
@@ -70,7 +70,7 @@ public class Highlighter {
         FileEditor[] editors = FileEditorManager.getInstance(DataStore.getInstance().getActiveProject())
             .getEditors(VirtualFileUtils.getVirtualFile(document));
 
-        setupLineStyle(type, colorOverlay);
+        setupLineStyle(type);
 
         for (FileEditor editor : editors) {
             if (editor instanceof TextEditor) {
@@ -84,12 +84,16 @@ public class Highlighter {
 
                 RangeHighlighter highlighter;
                 Optional<RangeHighlighter> existingHighlight = getExistingHighlight(document, lineNumber);
+
                 if (existingHighlight.isPresent()) {
                     highlighter = existingHighlight.get();
 
-                    if (colorOverlay && type == HighlightType.FAIL) {
+                    if (isModifiedLine && type == HighlightType.FAIL) {
                         markupModel.removeHighlighter(highlighter);
                         highlighter = markupModel.addLineHighlighter(lineNumber, HIGHLIGHTER_LAYER, textAttributes);
+                    } else if (highlighter.getTextAttributes() != null) {
+                        markupModel.removeHighlighter(highlighter);
+                        highlighter = markupModel.addLineHighlighter(lineNumber, HIGHLIGHTER_LAYER, null);
                     }
 
                 } else {
@@ -103,23 +107,19 @@ public class Highlighter {
         }
     }
 
-    private static void setupLineStyle(HighlightType type, boolean colorOverlay) {
+    private static void setupLineStyle(HighlightType type) {
         if (type == HighlightType.INFO) {
             highlightIcon = LivetestIcons.GutterIcons.INFO;
-            highlightColor = LivetestColors.HighlightColors.INFO;
+            highlightColor = null;
         } else if (type == HighlightType.EDIT) {
             highlightIcon = LivetestIcons.GutterIcons.EDIT;
-            highlightColor = LivetestColors.HighlightColors.INFO;
+            highlightColor = null;
         } else if (type == HighlightType.PASS) {
             highlightIcon = LivetestIcons.GutterIcons.PASS;
-            highlightColor = LivetestColors.HighlightColors.PASS;
+            highlightColor = null;
         } else if (type == HighlightType.FAIL) {
             highlightIcon = LivetestIcons.GutterIcons.FAIL;
             highlightColor = LivetestColors.HighlightColors.FAIL;
-        }
-
-        if (!colorOverlay) {
-            highlightColor = null;
         }
     }
 
