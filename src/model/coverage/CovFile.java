@@ -1,5 +1,6 @@
 package model.coverage;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,6 +44,10 @@ public class CovFile {
 
     public List<Integer> getLineNumbers() {
         return lines.values().stream().map(CovLine::getLineNumber).collect(Collectors.toList());
+    }
+
+    public Collection<CovLine> getCovLines() {
+        return lines.values();
     }
 
 }

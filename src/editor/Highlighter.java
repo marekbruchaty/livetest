@@ -17,6 +17,8 @@ import com.intellij.util.DocumentUtil;
 import icons.LivetestIcons;
 import listeners.LivetestDocumentListener;
 import model.coverage.CovFile;
+import model.coverage.CovLine;
+import model.coverage.CovTest;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import resources.DataStore;
@@ -25,9 +27,11 @@ import utils.VirtualFileUtils;
 import javax.swing.*;
 import java.awt.*;
 import java.util.Arrays;
+import java.util.Map;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Stream;
 
 /**
  * Utility class with static members used to interact with the editors highlighting features
@@ -48,6 +52,31 @@ public class Highlighter {
         INFO, EDIT, PASS, FAIL
     }
 
+//    public static void addLineHighlights(String filePath, CovFile covFile, Map<String, CovTest> covTests) {
+//        VirtualFile virtualFile = LocalFileSystem.getInstance().findFileByPath(filePath);
+//        if (virtualFile != null) {
+//
+//            Document document = FileDocumentManager.getInstance().getDocument(virtualFile);
+//            for (CovLine covLine : covFile.getCovLines()) {
+//                Boolean allPass =
+//                    covLine.getTests().stream().map(covTests::get).map(CovTest::isPassing).reduce(Boolean::logicalAnd)
+//                        .orElse(false);
+//
+//                String tooltip = covLine.getTests().stream().map(covTests::get)
+//                    .map(x -> x.getName() + " - " + (x.isPassing() ? "PASS" : "FAIL") + "\n").reduce(String::concat)
+//                    .orElse("");
+//
+//                addLineHighlight(document, covLine.getLineNumber() - 1,
+//                    allPass ? HighlightType.PASS : HighlightType.FAIL, tooltip);
+//
+//            }
+//            //TODO Add error, create tooltip text
+//
+//        } else {
+//            LOGGER.log(Level.SEVERE, "Cannot find VirtualFile while creating highlighter!");
+//        }
+//    }
+
     public static void addLineHighlight(String filePath, Integer line, HighlightType type, String tooltipText) {
         VirtualFile virtualFile = LocalFileSystem.getInstance().findFileByPath(filePath);
         if (virtualFile != null) {
@@ -62,9 +91,8 @@ public class Highlighter {
 
         MarkupModel markupModel = getMarkupModel(document);
 
-        FileEditor[] editors =
-            FileEditorManager.getInstance(DataStore.getInstance().getActiveProject())
-                .getEditors(VirtualFileUtils.getVirtualFile(document));
+        FileEditor[] editors = FileEditorManager.getInstance(DataStore.getInstance().getActiveProject())
+            .getEditors(VirtualFileUtils.getVirtualFile(document));
 
         initLineColor(type);
 
@@ -80,13 +108,11 @@ public class Highlighter {
 
                 RangeHighlighter highlighter;
 
-                Optional<RangeHighlighter> existingHighlight =
-                    getExistingHighlight(document, lineNumber);
+                Optional<RangeHighlighter> existingHighlight = getExistingHighlight(document, lineNumber);
                 if (existingHighlight.isPresent()) {
                     highlighter = existingHighlight.get();
                 } else {
-                    highlighter = markupModel
-                        .addLineHighlighter(lineNumber, HIGHLIGHTER_LAYER, textAttributes);
+                    highlighter = markupModel.addLineHighlighter(lineNumber, HIGHLIGHTER_LAYER, textAttributes);
                 }
 
                 if (highlightIcon != null) {
@@ -145,28 +171,24 @@ public class Highlighter {
         }
     }
 
-    private static boolean intersectsAndMatchLayer(RangeHighlighter highlighter,
-        TextRange lineTextRange) {
+    private static boolean intersectsAndMatchLayer(RangeHighlighter highlighter, TextRange lineTextRange) {
         return !(highlighter.getEndOffset() < lineTextRange.getStartOffset()
             || highlighter.getStartOffset() > lineTextRange.getEndOffset())
             && highlighter.getLayer() == HIGHLIGHTER_LAYER;
     }
 
     private static boolean highlightExists(Document document, int lineNumber) {
-        return Arrays.stream(getMarkupModel(document).getAllHighlighters()).anyMatch(
-            x -> intersectsAndMatchLayer(x, DocumentUtil.getLineTextRange(document, lineNumber)));
+        return Arrays.stream(getMarkupModel(document).getAllHighlighters())
+            .anyMatch(x -> intersectsAndMatchLayer(x, DocumentUtil.getLineTextRange(document, lineNumber)));
     }
 
-    private static Optional<RangeHighlighter> getExistingHighlight(Document document,
-        int lineNumber) {
-        return Arrays.stream(getMarkupModel(document).getAllHighlighters()).filter(
-            x -> intersectsAndMatchLayer(x, DocumentUtil.getLineTextRange(document, lineNumber)))
-            .findFirst();
+    private static Optional<RangeHighlighter> getExistingHighlight(Document document, int lineNumber) {
+        return Arrays.stream(getMarkupModel(document).getAllHighlighters())
+            .filter(x -> intersectsAndMatchLayer(x, DocumentUtil.getLineTextRange(document, lineNumber))).findFirst();
     }
 
     private static MarkupModel getMarkupModel(Document document) {
-        return DocumentMarkupModel
-            .forDocument(document, DataStore.getInstance().getActiveProject(), true);
+        return DocumentMarkupModel.forDocument(document, DataStore.getInstance().getActiveProject(), true);
     }
 
 }

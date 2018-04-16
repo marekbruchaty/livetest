@@ -22,7 +22,7 @@ public class DataStore {
     private ChangedFile lastChangedFile = new ChangedFile();
 
     // Original file state used for change detection
-    private Map<String, List<String>> unmodifiedFiles = new HashMap<>();
+    private Map<String, HashSet<String>> unmodifiedFiles = new HashMap<>();
 
     // Modified files used to execute used for test selection
     private Map<String, HashSet<Integer>> modifiedFiles = new HashMap<>();
@@ -76,7 +76,7 @@ public class DataStore {
     /*
     * Unmodified files
     * */
-    public Map<String, List<String>> getUnmodifiedFiles() {
+    public Map<String, HashSet<String>> getUnmodifiedFiles() {
         return unmodifiedFiles;
     }
 
@@ -88,9 +88,12 @@ public class DataStore {
         return this.unmodifiedFiles.containsKey(path);
     }
 
-    public void addUnmodifiedFile(String path, List<String> text) {
-        this.unmodifiedFiles.put(path, text);
+    public void addUnmodifiedFile(String path, Set<String> text) {
+        this.unmodifiedFiles.put(path, (HashSet<String>) text);
     }
+
+//    public void updateUnmodifiedFiles() {
+//    }
 
 
     /*
@@ -100,8 +103,8 @@ public class DataStore {
         return modifiedFiles.keySet();
     }
 
-    public Map<String, HashSet<Integer>> resetModifiedFiles() {
-        return this.modifiedFiles = new HashMap<>();
+    public void resetModifiedFiles() {
+        this.modifiedFiles = new HashMap<>();
     }
 
     public void addChangedLine(String filePath, int lineNumber) {
@@ -207,5 +210,9 @@ public class DataStore {
 
     public boolean existsCovTest(String testName) {
         return covTests.containsKey(testName);
+    }
+
+    public Map<String, CovTest> getCovTests() {
+        return covTests;
     }
 }

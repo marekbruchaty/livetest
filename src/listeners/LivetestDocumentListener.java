@@ -33,17 +33,15 @@ public class LivetestDocumentListener implements DocumentListener {
         VirtualFile virtualFile = VirtualFileUtils.getVirtualFile(event.getDocument());
 
         if (!isPythonProjectFile(virtualFile)) {
-            log.log(Level.INFO, String.format(
-                "%s is and underscored file, not a python file or project file. Moving on...",
-                virtualFile.getName()));
+            log.log(Level.INFO, String
+                .format("%s is and underscored file, not a python file or project file. Moving on...",
+                    virtualFile.getName()));
             return;
         }
 
         int lineNumber = getLineNumber(event.getDocument().getText(), event.getOffset());
-        String newLine =
-            Arrays.asList(event.getDocument().getText().split("\n")).get(lineNumber).trim();
-        String oldLine =
-            FileStore.getInstance().getUnmodifiedFile(virtualFile.getPath(), lineNumber);
+        String newLine = Arrays.asList(event.getDocument().getText().split("\n")).get(lineNumber).trim();
+        String oldLine = FileStore.getInstance().getUnmodifiedFile(virtualFile.getPath(), lineNumber);
 
         if (oldLine.equalsIgnoreCase(newLine)) {
             DataStore.getInstance().removeChangedLine(virtualFile.getPath(), lineNumber);
@@ -57,16 +55,14 @@ public class LivetestDocumentListener implements DocumentListener {
             DataStore.getInstance().addChangedLine(virtualFile.getPath(), lineNumber);
             DataStore.getInstance().resetLastChangeTimeMillis();
             Highlighter
-                .addLineHighlight(event.getDocument(), lineNumber, Highlighter.HighlightType.EDIT,
-                    "Line changed");
+                .addLineHighlight(event.getDocument(), lineNumber, Highlighter.HighlightType.EDIT, "Line changed");
         }
     }
 
     private boolean isPythonProjectFile(VirtualFile virtualFile) {
-        return virtualFile.getPath().startsWith(
-            Objects.requireNonNull(DataStore.getInstance().getActiveProject().getBasePath()))
-            && virtualFile.getName().toLowerCase().endsWith(".py") && !virtualFile.getName()
-            .startsWith("__");
+        return virtualFile.getPath()
+            .startsWith(Objects.requireNonNull(DataStore.getInstance().getActiveProject().getBasePath())) && virtualFile
+            .getName().toLowerCase().endsWith(".py") && !virtualFile.getName().startsWith("__");
     }
 
     private int getLineNumber(String fileContent, int offset) {
