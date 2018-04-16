@@ -7,7 +7,6 @@ import editor.Highlighter;
 import model.coverage.CovFile;
 import org.apache.commons.lang.StringUtils;
 import resources.DataStore;
-import resources.FileStore;
 import utils.VirtualFileUtils;
 
 import java.util.Arrays;
@@ -23,8 +22,8 @@ public class LivetestDocumentListener implements DocumentListener {
 
     @Override public void beforeDocumentChange(DocumentEvent event) {
         VirtualFile virtualFile = VirtualFileUtils.getVirtualFile(event.getDocument());
-        if (!FileStore.getInstance().existsUnmodifiedFile(virtualFile.getPath())) {
-            FileStore.getInstance().addUnmodifiedFile(virtualFile.getPath(),
+        if (!ds.existsUnmodifiedFile(virtualFile.getPath())) {
+            ds.addUnmodifiedFile(virtualFile.getPath(),
                 Arrays.stream(event.getDocument().getText().split("\n")).map(String::trim)
                     .collect(Collectors.toList()));
         }
@@ -42,7 +41,7 @@ public class LivetestDocumentListener implements DocumentListener {
 
         int lineNumber = getLineNumber(event.getDocument().getText(), event.getOffset());
         String newLine = Arrays.asList(event.getDocument().getText().split("\n")).get(lineNumber).trim();
-        String oldLine = FileStore.getInstance().getUnmodifiedFile(virtualFile.getPath(), lineNumber);
+        String oldLine = ds.getUnmodifiedFileLine(virtualFile.getPath(), lineNumber);
 
         if (oldLine.equalsIgnoreCase(newLine)) {
             ds.removeChangedLine(virtualFile.getPath(), lineNumber);

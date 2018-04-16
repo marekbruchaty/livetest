@@ -52,30 +52,6 @@ public class Highlighter {
         INFO, EDIT, PASS, FAIL
     }
 
-//    public static void addLineHighlights(String filePath, CovFile covFile, Map<String, CovTest> covTests) {
-//        VirtualFile virtualFile = LocalFileSystem.getInstance().findFileByPath(filePath);
-//        if (virtualFile != null) {
-//
-//            Document document = FileDocumentManager.getInstance().getDocument(virtualFile);
-//            for (CovLine covLine : covFile.getCovLines()) {
-//                Boolean allPass =
-//                    covLine.getTests().stream().map(covTests::get).map(CovTest::isPassing).reduce(Boolean::logicalAnd)
-//                        .orElse(false);
-//
-//                String tooltip = covLine.getTests().stream().map(covTests::get)
-//                    .map(x -> x.getName() + " - " + (x.isPassing() ? "PASS" : "FAIL") + "\n").reduce(String::concat)
-//                    .orElse("");
-//
-//                addLineHighlight(document, covLine.getLineNumber() - 1,
-//                    allPass ? HighlightType.PASS : HighlightType.FAIL, tooltip);
-//
-//            }
-//            //TODO Add error, create tooltip text
-//
-//        } else {
-//            LOGGER.log(Level.SEVERE, "Cannot find VirtualFile while creating highlighter!");
-//        }
-//    }
 
     public static void addLineHighlight(String filePath, Integer line, HighlightType type, String tooltipText) {
         VirtualFile virtualFile = LocalFileSystem.getInstance().findFileByPath(filePath);
@@ -175,11 +151,6 @@ public class Highlighter {
         return !(highlighter.getEndOffset() < lineTextRange.getStartOffset()
             || highlighter.getStartOffset() > lineTextRange.getEndOffset())
             && highlighter.getLayer() == HIGHLIGHTER_LAYER;
-    }
-
-    private static boolean highlightExists(Document document, int lineNumber) {
-        return Arrays.stream(getMarkupModel(document).getAllHighlighters())
-            .anyMatch(x -> intersectsAndMatchLayer(x, DocumentUtil.getLineTextRange(document, lineNumber)));
     }
 
     private static Optional<RangeHighlighter> getExistingHighlight(Document document, int lineNumber) {

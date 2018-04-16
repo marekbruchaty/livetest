@@ -22,7 +22,7 @@ public class DataStore {
     private ChangedFile lastChangedFile = new ChangedFile();
 
     // Original file state used for change detection
-    private Map<String, HashSet<String>> unmodifiedFiles = new HashMap<>();
+    private Map<String, List<String>> unmodifiedFiles = new HashMap<>();
 
     // Modified files used to execute used for test selection
     private Map<String, HashSet<Integer>> modifiedFiles = new HashMap<>();
@@ -76,31 +76,35 @@ public class DataStore {
     /*
     * Unmodified files
     * */
-    public Map<String, HashSet<String>> getUnmodifiedFiles() {
-        return unmodifiedFiles;
-    }
-
-    public void initUnmodifiedFiles() {
+    public void resetUnmodifiedFiles() {
         this.unmodifiedFiles = new HashMap<>();
     }
 
-    public boolean unmodifiedFileExists(String path) {
-        return this.unmodifiedFiles.containsKey(path);
+    public void addUnmodifiedFile(String path, List<String> lines) {
+        this.unmodifiedFiles.put(path, lines);
     }
 
-    public void addUnmodifiedFile(String path, Set<String> text) {
-        this.unmodifiedFiles.put(path, (HashSet<String>) text);
+    public boolean existsUnmodifiedFile(String path) {
+        return unmodifiedFiles.containsKey(path);
     }
 
-//    public void updateUnmodifiedFiles() {
-//    }
+    public String getUnmodifiedFileLine(String path, int lineIndex) {
+        List<String> lines = unmodifiedFiles.get(path);
+        if (lines == null)
+            return null;
+        return lines.get(lineIndex);
+    }
 
 
     /*
     * Modified files
     * */
-    public Set<String> getModifiedFiles() {
+    public Set<String> getModifiedFileNames() {
         return modifiedFiles.keySet();
+    }
+
+    public Map<String, HashSet<Integer>> getModifiedFiles() {
+        return modifiedFiles;
     }
 
     public void resetModifiedFiles() {

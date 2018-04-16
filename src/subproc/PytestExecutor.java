@@ -6,13 +6,14 @@ import exceptions.LivetestException;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.List;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 public class PytestExecutor {
+
+    private static final String EOL = "\n";
 
     private PytestExecutor() {
     }
@@ -26,7 +27,7 @@ public class PytestExecutor {
      */
     public static String runCoverageForWholeProject(String projectFilePath) {
         Process process = execProcess("pytest -v " + projectFilePath  + " --tb=no");
-        return getStdInput(process) + "\n" + getStdError(process);
+        return getStdInput(process) + EOL + getStdError(process);
     }
 
     /**
@@ -41,18 +42,7 @@ public class PytestExecutor {
         LOGGER.log(Level.INFO, "Test case re-run. Executing command: {0}", command);
 
         Process process = execProcess(command);
-        return getStdInput(process) + "\n" + getStdError(process);
-    }
-
-    /**
-     * Executes test code coverage for specific test cases
-     *
-     * @param testCaseUrls format -> filePath::module::testCase
-     */
-    public static void runCoverageForTests(List<String> testCaseUrls) {
-        for (String url : testCaseUrls) {
-            Process process = execProcess("pytest ");
-        }
+        return getStdInput(process) + EOL + getStdError(process);
     }
 
     public static boolean isFileSyntaxOk(String filePath) {
@@ -92,13 +82,13 @@ public class PytestExecutor {
     private static String getStdInput(Process process) {
         BufferedReader stdInput =
             new BufferedReader(new InputStreamReader(process.getInputStream()));
-        return stdInput.lines().collect(Collectors.joining("\n"));
+        return stdInput.lines().collect(Collectors.joining(EOL));
     }
 
     private static String getStdError(Process process) {
         BufferedReader stdError =
             new BufferedReader(new InputStreamReader(process.getErrorStream()));
-        return stdError.lines().collect(Collectors.joining("\n"));
+        return stdError.lines().collect(Collectors.joining(EOL));
 
     }
 

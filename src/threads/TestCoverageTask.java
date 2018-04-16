@@ -33,7 +33,7 @@ public class TestCoverageTask {
     private boolean initialRun = true;
 
     public void run() {
-        if (initialRun || (ds.delayElapsed() && !ds.getModifiedFiles().isEmpty())) {
+        if (initialRun || (ds.delayElapsed() && !ds.getModifiedFileNames().isEmpty())) {
             LOGGER.log(Level.INFO, "Running coverage task");
 
             // Force save all files in project
@@ -54,8 +54,6 @@ public class TestCoverageTask {
             // Update visible highlighters
             updateHighlights();
 
-            updateCoverageData();
-
             // clear coverage file and code modification records from memory
             cleanUp();
 
@@ -65,15 +63,16 @@ public class TestCoverageTask {
         }
     }
 
-    private void updateCoverageData() {
-
-    }
-
 
     private void runTestsChangesOnly() {
         LOGGER.log(Level.INFO, "Running coverage for changed lines covered by test suite only");
-        for (String modFileName : ds.getModifiedFiles()) {
+        for (String modFileName : ds.getModifiedFileNames()) {
             CovFile covFile = ds.getCovFile(modFileName);
+
+            if (covFile == null) {
+                LOGGER.log(Level.INFO, "File {0} is not tracked. Skipping coverage...");
+                return;
+            }
 
             LOGGER.log(Level.INFO, "File {0} modified. These tests need to be reruned", covFile.getName());
 
@@ -95,11 +94,12 @@ public class TestCoverageTask {
 
     private void runTestForChanges(String testName, CovTest covTest) {
         String report = PytestExecutor.runCoverageForTestCase(covTest.getFilePath(), testName);
-        Map<String, String> map = PytestReportProcesor.getTestNamePathMapping(report, true);
 
-        for (String key : map.keySet()) {
-            ds.getCovTest(key).setPassing(false);
+        Map<String, Boolean> map = PytestReportProcesor.getTestNameStatusMapping(report);
+        for (Map.Entry<String, Boolean> entry : map.entrySet()) {
+            ds.getCovTest(entry.getKey()).setPassing(entry.getValue());
         }
+
     }
 
     private void runTestsWholeProject() {
@@ -129,7 +129,7 @@ public class TestCoverageTask {
 
     private boolean isSyntaxOk() {
         LOGGER.log(Level.INFO, "Checking file syntax");
-        for (String fileName : ds.getModifiedFiles()) {
+        for (String fileName : ds.getModifiedFileNames()) {
             if (!PytestExecutor.isFileSyntaxOk(fileName)) {
                 return false;
             }
@@ -140,6 +140,7 @@ public class TestCoverageTask {
     private void cleanUp() {
         LOGGER.log(Level.INFO, "Cleaning metadata");
         ds.resetModifiedFiles();
+        ds.resetUnmodifiedFiles();
     }
 
     private void updateHighlights() {
