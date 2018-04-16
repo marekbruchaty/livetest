@@ -66,7 +66,7 @@ public class TestCoverageTask {
     }
 
     private void updateCoverageData() {
-        
+
     }
 
 
@@ -106,7 +106,7 @@ public class TestCoverageTask {
         LOGGER.log(Level.INFO, "Running coverage for whole project");
         // Run coverage for the whole project
         String report =
-            PytestExecutor.runCoverageForWholeProject(DataStore.getInstance().getActiveProject().getBasePath());
+            PytestExecutor.runCoverageForWholeProject(ds.getActiveProject().getBasePath());
 
         LOGGER.log(Level.INFO, "Acquired pytest report:\n{0}", report);
 

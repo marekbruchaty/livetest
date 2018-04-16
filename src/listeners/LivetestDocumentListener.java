@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 public class LivetestDocumentListener implements DocumentListener {
 
     private static final Logger log = Logger.getLogger(LivetestDocumentListener.class.getName());
+    private DataStore ds = DataStore.getInstance();
 
     @Override public void beforeDocumentChange(DocumentEvent event) {
         VirtualFile virtualFile = VirtualFileUtils.getVirtualFile(event.getDocument());
@@ -44,16 +45,16 @@ public class LivetestDocumentListener implements DocumentListener {
         String oldLine = FileStore.getInstance().getUnmodifiedFile(virtualFile.getPath(), lineNumber);
 
         if (oldLine.equalsIgnoreCase(newLine)) {
-            DataStore.getInstance().removeChangedLine(virtualFile.getPath(), lineNumber);
-            CovFile covFile = DataStore.getInstance().getCovFile(virtualFile.getPath());
+            ds.removeChangedLine(virtualFile.getPath(), lineNumber);
+            CovFile covFile = ds.getCovFile(virtualFile.getPath());
 
             if (!covFile.existsCovLine(lineNumber)) {
                 Highlighter.removeLineHighlight(event.getDocument(), lineNumber);
             }
 
         } else {
-            DataStore.getInstance().addChangedLine(virtualFile.getPath(), lineNumber);
-            DataStore.getInstance().resetLastChangeTimeMillis();
+            ds.addChangedLine(virtualFile.getPath(), lineNumber);
+            ds.resetLastChangeTimeMillis();
             Highlighter
                 .addLineHighlight(event.getDocument(), lineNumber, Highlighter.HighlightType.EDIT, "Line changed");
         }
@@ -61,7 +62,7 @@ public class LivetestDocumentListener implements DocumentListener {
 
     private boolean isPythonProjectFile(VirtualFile virtualFile) {
         return virtualFile.getPath()
-            .startsWith(Objects.requireNonNull(DataStore.getInstance().getActiveProject().getBasePath())) && virtualFile
+            .startsWith(Objects.requireNonNull(ds.getActiveProject().getBasePath())) && virtualFile
             .getName().toLowerCase().endsWith(".py") && !virtualFile.getName().startsWith("__");
     }
 
