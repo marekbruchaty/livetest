@@ -142,7 +142,7 @@ public class DataStore {
     }
 
     public boolean delayElapsed() {
-        return System.currentTimeMillis() + TIME_DELAY > lastChangeTimeMillis;
+        return lastChangeTimeMillis + TIME_DELAY > System.currentTimeMillis();
     }
 
 

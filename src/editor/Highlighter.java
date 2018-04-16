@@ -16,6 +16,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.DocumentUtil;
 import icons.LivetestIcons;
 import listeners.LivetestDocumentListener;
+import model.coverage.CovFile;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import resources.DataStore;
@@ -25,6 +26,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -32,7 +34,7 @@ import java.util.logging.Logger;
  */
 public class Highlighter {
 
-    private static final Logger log = Logger.getLogger(LivetestDocumentListener.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(LivetestDocumentListener.class.getName());
     private static final int HIGHLIGHTER_LAYER = 66;
 
     private Highlighter() {
@@ -46,19 +48,14 @@ public class Highlighter {
         INFO, EDIT, PASS, FAIL
     }
 
-    public static void addLineHighlight(String filePath, Iterable<Integer> lines,
-        HighlightType type, String tooltipText) {
-        VirtualFile virtualFile = LocalFileSystem.getInstance().findFileByPath(filePath);
-        Document document = FileDocumentManager.getInstance().getDocument(virtualFile);
-        for (int line : lines) {
-            addLineHighlight(document, line - 1, type, tooltipText);
-        }
-    }
-
     public static void addLineHighlight(String filePath, Integer line, HighlightType type, String tooltipText) {
         VirtualFile virtualFile = LocalFileSystem.getInstance().findFileByPath(filePath);
-        Document document = FileDocumentManager.getInstance().getDocument(virtualFile);
-        addLineHighlight(document, line - 1, type, tooltipText);
+        if (virtualFile != null) {
+            Document document = FileDocumentManager.getInstance().getDocument(virtualFile);
+            addLineHighlight(document, line - 1, type, tooltipText);
+        } else {
+            LOGGER.log(Level.SEVERE, "Cannot find VirtualFile while creating highlighter!");
+        }
     }
 
     public static void addLineHighlight(Document document, int lineNumber, HighlightType type, String tooltipText) {
@@ -104,8 +101,6 @@ public class Highlighter {
             highlightIcon = LivetestIcons.GutterIcons.INFO;
             highlightColor = null;
         } else if (type == HighlightType.EDIT) {
-//            highlightIcon = null;
-//            highlightColor = LivetestColors.HighlightColors.INFO;
             highlightIcon = LivetestIcons.GutterIcons.EDIT;
             highlightColor = null;
         } else if (type == HighlightType.PASS) {

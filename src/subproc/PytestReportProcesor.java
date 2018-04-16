@@ -16,10 +16,10 @@ public class PytestReportProcesor {
     private PytestReportProcesor() {
     }
 
-    public static Map<String, String> getTestNamePathMapping(String report) {
-        return Arrays.stream(report.split("\n"))
-            .filter(x -> x.contains(PASSED) || x.contains(ERROR))
-            .map(x -> x.split(DOUBLE_DASH_DELIMITER)).collect(Collectors
-                .toMap(s -> s[1].split(" ")[0], s -> SLASH + s[0].replace(STEP_BACK + SLASH, "")));
+    public static Map<String, String> getTestNamePathMapping(String report, boolean errorOnly) {
+        return Arrays.stream(report.split("\n")).filter(
+            x -> (errorOnly && x.contains(ERROR)) || (!errorOnly && (x.contains(PASSED) || x
+                .contains(ERROR)))).map(x -> x.split(DOUBLE_DASH_DELIMITER)).collect(Collectors
+            .toMap(s -> s[1].split(" ")[0], s -> SLASH + s[0].replace(STEP_BACK + SLASH, "")));
     }
 }

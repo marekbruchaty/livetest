@@ -34,9 +34,8 @@ public class TestCoverageThread extends Thread {
         TimerTask timerTask = new TimerTask() {
 
             @Override public void run() {
-                if (initialRun || (DataStore.getInstance().delayElapsed() && !ds.getModifiedFiles()
-                    .isEmpty())) {
-                    LOGGER.log(Level.INFO,"Running coverage task");
+                if (initialRun || (ds.delayElapsed() && !ds.getModifiedFiles().isEmpty())) {
+                    LOGGER.log(Level.INFO, "Running coverage task");
 
                     // Force save all files in project
                     safeAllFiles();
@@ -61,11 +60,14 @@ public class TestCoverageThread extends Thread {
                     cleanUp();
 
                     initialRun = false;
+                } else {
+                    LOGGER.log(Level.INFO, "No changes. Elapsed time: {0}", ds.delayElapsed());
                 }
             }
 
             private void runTestsForChanges() {
-                LOGGER.log(Level.INFO, "Running coverage for changed lines covered by test suite only");
+                LOGGER.log(Level.INFO,
+                    "Running coverage for changed lines covered by test suite only");
                 for (String modFileName : ds.getModifiedFiles()) {
                     CovFile covFile = ds.getCovFile(modFileName);
 
@@ -73,15 +75,37 @@ public class TestCoverageThread extends Thread {
                         covFile.getName());
 
                     for (Integer lineNumber : ds.getChangedLines(modFileName)) {
-                        CovLine covLine = covFile.getCovLine(lineNumber);
+                        CovLine covLine = covFile.getCovLine(lineNumber + 1);
+
+                        if (covLine == null) {
+                            LOGGER.log(Level.INFO, "Line number {0} is not covered by any test.",
+                                lineNumber);
+                            //TODO We should probably rerun all tests for the method now
+                            continue;
+                        }
+
                         Set<String> tests = covLine.getTests();
 
                         for (String testName : tests) {
                             CovTest covTest = ds.getCovTest(testName);
-                            LOGGER.log(Level.INFO, "Reruning testcase {0}", testName);
+
                             String report = PytestExecutor
                                 .runCoverageForTestCase(covTest.getFilePath(), testName);
-                            LOGGER.log(Level.INFO, "Rerun report: {0}", report);
+
+                            Map<String, String> map =
+                                PytestReportProcesor.getTestNamePathMapping(report, true);
+
+                            for (String key: map.keySet()) {
+                                ds.getCovTest(key).setPassing(false);
+
+                                ApplicationManager.getApplication().invokeAndWait(
+                                    () -> ApplicationManager.getApplication().runWriteAction(
+                                        () -> Highlighter.addLineHighlight(covFile.getName(), lineNumber, Highlighter.HighlightType.FAIL,
+                                            "")));
+
+                            }
+                            // TODO Update highlighth
+
                         }
                     }
                 }
@@ -93,12 +117,17 @@ public class TestCoverageThread extends Thread {
                 String report = PytestExecutor.runCoverageForWholeProject(
                     DataStore.getInstance().getActiveProject().getBasePath());
 
-                Map<String, String> testMap = PytestReportProcesor.getTestNamePathMapping(report);
+                LOGGER.log(Level.INFO, "Acquired pytest report:\n{0}", report);
+
+                Map<String, String> testMap =
+                    PytestReportProcesor.getTestNamePathMapping(report, false);
+
+                LOGGER.log(Level.INFO, "Test name / test path - map:\n{0}", report);
 
                 // Load coverage data to memory
                 CoverageLoader.loadAndSaveCoverageData(testMap);
 
-                // Update test results - if tests passed or failed
+                // Update test results - if tests have passed or failed
                 updateTestResults(report);
             }
 

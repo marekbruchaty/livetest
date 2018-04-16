@@ -120,7 +120,7 @@ public class SimpleTest {
                 + "\n"
                 + "=========================== 5 passed in 0.45 seconds ===========================\n";
 
-        Map<String, String> map = PytestReportProcesor.getTestNamePathMapping(report);
+        Map<String, String> map = PytestReportProcesor.getTestNamePathMapping(report, false);
 
         Assertions.assertTrue(map.get("test_default_initial_amount")
             .equalsIgnoreCase("/work/priv/python/python-tests/tests/test_wallet_pytest.py"));

@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
 import java.util.Scanner;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -16,7 +17,7 @@ public class PytestExecutor {
     private PytestExecutor() {
     }
 
-    private static final Logger log = Logger.getLogger(PytestExecutor.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(PytestExecutor.class.getName());
 
     /**
      * Executes all projects test cases
@@ -35,7 +36,11 @@ public class PytestExecutor {
      * @param testCaseName format -> test case name
      */
     public static String runCoverageForTestCase(String testFilePath, String testCaseName) {
-        Process process = execProcess("pytest -v " + testFilePath + "::" + testCaseName  + " --tb=no");
+        String command = "pytest -v " + testFilePath + "::" + testCaseName  + " --tb=no";
+
+        LOGGER.log(Level.INFO, "Test case re-run. Executing command: {0}", command);
+
+        Process process = execProcess(command);
         return getStdInput(process) + "\n" + getStdError(process);
     }
 
