@@ -9,6 +9,7 @@ public class LivetestColors {
 
     public static class HighlightColors {
         public static final Color INFO = Color.DARK_GRAY;
+        public static final Color EDIT = Color.DARK_GRAY;
         public static final Color PASS = Color.GREEN;
         public static final Color FAIL = Color.RED;
 

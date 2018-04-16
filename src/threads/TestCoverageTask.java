@@ -12,6 +12,7 @@ import subproc.PytestExecutor;
 import subproc.PytestReportProcesor;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -99,14 +100,12 @@ public class TestCoverageTask {
         for (Map.Entry<String, Boolean> entry : map.entrySet()) {
             ds.getCovTest(entry.getKey()).setPassing(entry.getValue());
         }
-
     }
 
     private void runTestsWholeProject() {
         LOGGER.log(Level.INFO, "Running coverage for whole project");
         // Run coverage for the whole project
-        String report =
-            PytestExecutor.runCoverageForWholeProject(ds.getActiveProject().getBasePath());
+        String report = PytestExecutor.runCoverageForWholeProject(ds.getActiveProject().getBasePath());
 
         LOGGER.log(Level.INFO, "Acquired pytest report:\n{0}", report);
 
@@ -170,9 +169,17 @@ public class TestCoverageTask {
                 }
 
                 Highlighter.HighlightType finalHType = hType;
+
+                boolean colorOverlay = false;
+                HashSet<Integer> modifiedLines = ds.getModifiedFiles().get(fileName);
+                if (modifiedLines != null ) {
+                    colorOverlay = modifiedLines.contains(lineNumber - 1);
+                }
+
+                boolean finalColorOverlay = colorOverlay;
                 ApplicationManager.getApplication().invokeAndWait(() -> ApplicationManager.getApplication()
                     .runWriteAction(
-                        () -> Highlighter.addLineHighlight(fileName, lineNumber, finalHType, sb.toString())));
+                         () -> Highlighter.addLineHighlight(fileName, lineNumber, finalHType, finalColorOverlay, sb.toString())));
             }
         }
     }

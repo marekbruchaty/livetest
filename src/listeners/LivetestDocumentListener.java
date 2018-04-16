@@ -55,7 +55,7 @@ public class LivetestDocumentListener implements DocumentListener {
             ds.addChangedLine(virtualFile.getPath(), lineNumber);
             ds.resetLastChangeTimeMillis();
             Highlighter
-                .addLineHighlight(event.getDocument(), lineNumber, Highlighter.HighlightType.EDIT, "Line changed");
+                .addLineHighlight(event.getDocument(), lineNumber, Highlighter.HighlightType.EDIT, false, "Line changed");
         }
     }
 
