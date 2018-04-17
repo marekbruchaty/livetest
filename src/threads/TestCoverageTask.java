@@ -82,7 +82,6 @@ public class TestCoverageTask {
 
                 if (covLine == null) {
                     LOGGER.log(Level.INFO, "Line number {0} is not covered by any test.", lineNumber);
-                    //TODO We should probably rerun all tests for the modified method here
                     continue;
                 }
 
@@ -104,17 +103,14 @@ public class TestCoverageTask {
 
     private void runTestsWholeProject() {
         LOGGER.log(Level.INFO, "Running coverage for whole project");
+
         // Run coverage for the whole project
         String report = PytestExecutor.runCoverageForWholeProject(ds.getActiveProject().getBasePath());
 
         LOGGER.log(Level.INFO, "Acquired pytest report:\n{0}", report);
 
-        Map<String, String> testMap = PytestReportProcesor.getTestNamePathMapping(report, false);
-
-        LOGGER.log(Level.INFO, "Test name / test path - map:\n{0}", report);
-
         // Load coverage data to memory
-        CoverageLoader.loadAndSaveCoverageData(testMap);
+        CoverageLoader.loadAndSaveCoverageData(PytestReportProcesor.getTestNamePathMapping(report, false));
 
         // Update test results - if tests have passed or failed
         updateTestResults(report);
