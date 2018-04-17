@@ -25,7 +25,6 @@ import utils.VirtualFileUtils;
 import javax.swing.*;
 import java.awt.*;
 import java.util.Arrays;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -55,8 +54,8 @@ public class Highlighter {
         VirtualFile virtualFile = LocalFileSystem.getInstance().findFileByPath(filePath);
         if (virtualFile != null) {
             LOGGER.log(Level.INFO, "Adding highlighter for line number " + lineNumber + ", file " + filePath);
-            addLineHighlight(FileDocumentManager.getInstance().getDocument(virtualFile), lineNumber - 1, type, isModifiedLine,
-                tooltipText);
+            addLineHighlight(FileDocumentManager.getInstance().getDocument(virtualFile), lineNumber - 1, type,
+                isModifiedLine, tooltipText);
         } else {
             LOGGER.log(Level.SEVERE, "Cannot find VirtualFile while creating highlighter!");
         }
@@ -65,46 +64,49 @@ public class Highlighter {
     public static void addLineHighlight(Document document, int lineNumber, HighlightType type, boolean isModifiedLine,
         String tooltipText) {
 
-        MarkupModel markupModel = getMarkupModel(document);
-
-        FileEditor[] editors = FileEditorManager.getInstance(DataStore.getInstance().getActiveProject())
-            .getEditors(VirtualFileUtils.getVirtualFile(document));
-
         setupLineStyle(type);
 
-        for (FileEditor editor : editors) {
-            if (editor instanceof TextEditor) {
-
-                TextAttributes textAttributes = null;
-                if (highlightColor != null) {
-                    textAttributes = new TextAttributes();
-                    textAttributes.setBackgroundColor(highlightColor);
-                    textAttributes.setErrorStripeColor(highlightColor);
-                }
-
-                RangeHighlighter highlighter;
-                Optional<RangeHighlighter> existingHighlight = getExistingHighlight(document, lineNumber);
-
-                if (existingHighlight.isPresent()) {
-                    highlighter = existingHighlight.get();
-
-                    if (isModifiedLine && type == HighlightType.FAIL) {
-                        markupModel.removeHighlighter(highlighter);
-                        highlighter = markupModel.addLineHighlighter(lineNumber, HIGHLIGHTER_LAYER, textAttributes);
-                    } else if (highlighter.getTextAttributes() != null) {
-                        markupModel.removeHighlighter(highlighter);
-                        highlighter = markupModel.addLineHighlighter(lineNumber, HIGHLIGHTER_LAYER, null);
-                    }
-
-                } else {
-                    highlighter = markupModel.addLineHighlighter(lineNumber, HIGHLIGHTER_LAYER, textAttributes);
-                }
-
-                if (highlightIcon != null) {
-                    addGutterIcon(highlighter, highlightIcon, tooltipText);
-                }
+        for (FileEditor editor : FileEditorManager.getInstance(DataStore.getInstance().getActiveProject())
+            .getEditors(VirtualFileUtils.getVirtualFile(document))) {
+            if (editor instanceof TextEditor && highlightIcon != null) {
+                addGutterIcon(getRangeHighlighter(document, lineNumber, type, isModifiedLine), highlightIcon, tooltipText);
             }
         }
+    }
+
+    @NotNull private static RangeHighlighter getRangeHighlighter(Document document, int lineNumber, HighlightType type,
+        boolean isModifiedLine) {
+        MarkupModel markupModel = getMarkupModel(document);
+        TextAttributes textAttributes = getTextAttributes();
+
+        RangeHighlighter highlighter;
+        Optional<RangeHighlighter> existingHighlight = getExistingHighlighter(document, lineNumber);
+        if (existingHighlight.isPresent()) {
+            highlighter = existingHighlight.get();
+
+            if (isModifiedLine && type == HighlightType.FAIL) {
+                markupModel.removeHighlighter(highlighter);
+                highlighter = markupModel.addLineHighlighter(lineNumber, HIGHLIGHTER_LAYER, textAttributes);
+            } else if (highlighter.getTextAttributes() != null) {
+                markupModel.removeHighlighter(highlighter);
+                highlighter = markupModel.addLineHighlighter(lineNumber, HIGHLIGHTER_LAYER, null);
+            }
+
+        } else {
+            highlighter = markupModel.addLineHighlighter(lineNumber, HIGHLIGHTER_LAYER, textAttributes);
+        }
+
+        return highlighter;
+    }
+
+    @Nullable private static TextAttributes getTextAttributes() {
+        TextAttributes textAttributes = null;
+        if (highlightColor != null) {
+            textAttributes = new TextAttributes();
+            textAttributes.setBackgroundColor(highlightColor);
+            textAttributes.setErrorStripeColor(highlightColor);
+        }
+        return textAttributes;
     }
 
     private static void setupLineStyle(HighlightType type) {
@@ -162,7 +164,7 @@ public class Highlighter {
             && highlighter.getLayer() == HIGHLIGHTER_LAYER;
     }
 
-    private static Optional<RangeHighlighter> getExistingHighlight(Document document, int lineNumber) {
+    private static Optional<RangeHighlighter> getExistingHighlighter(Document document, int lineNumber) {
         return Arrays.stream(getMarkupModel(document).getAllHighlighters())
             .filter(x -> intersectsAndMatchLayer(x, DocumentUtil.getLineTextRange(document, lineNumber))).findFirst();
     }
