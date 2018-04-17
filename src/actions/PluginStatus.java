@@ -9,7 +9,7 @@ import java.util.logging.Logger;
 
 public class PluginStatus extends AnAction {
 
-    private final static Logger LOGGER = Logger.getLogger(PluginStatus.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(PluginStatus.class.getName());
 
     public PluginStatus() {
         super("Hello");

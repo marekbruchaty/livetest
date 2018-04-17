@@ -24,11 +24,6 @@ public class PluginInitialization implements ApplicationComponent {
     private void initListeners() {
         initProjectManagerListeners(); // Project info
         initDocumentListeners(); // File change info - can detect every file change
-        initVirtualFileListeners(); // File change info
-    }
-
-    private void initVirtualFileListeners() {
-//        VirtualFileManager.getInstance().addVirtualFileListener(new LivetestFileListener());
     }
 
     private void initDocumentListeners() {
