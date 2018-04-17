@@ -19,11 +19,6 @@ public class LivetestPsiTreeChangeListenerImpl implements PsiTreeChangeListener 
 
     @Override public void beforeChildAddition(@NotNull PsiTreeChangeEvent psiTreeChangeEvent) {
         log.log(Level.FINE, String.format("beforeChildAddition | PsiTreeChangeEvent: %s", psiTreeChangeEvent));
-//        Document document =
-//            PsiDocumentManager.getInstance(DataStore.getInstance().getActiveProject())
-//                .getDocument(psiTreeChangeEvent.getFile());
-//        System.out.println("beforeChildAddition: " + document.getText());
-
     }
 
     @Override public void beforeChildRemoval(@NotNull PsiTreeChangeEvent psiTreeChangeEvent) {
@@ -45,11 +40,6 @@ public class LivetestPsiTreeChangeListenerImpl implements PsiTreeChangeListener 
     @Override public void beforeChildrenChange(@NotNull PsiTreeChangeEvent psiTreeChangeEvent) {
         log.info(
             String.format("beforeChildrenChange | PsiTreeChangeEvent: %s", psiTreeChangeEvent));
-//        Document document =
-//            PsiDocumentManager.getInstance(DataStore.getInstance().getActiveProject())
-//                .getDocument(psiTreeChangeEvent.getFile());
-//        System.out.println("beforeChildrenChange: " + document.getText());
-
     }
 
     @Override public void beforePropertyChange(@NotNull PsiTreeChangeEvent psiTreeChangeEvent) {
@@ -60,12 +50,6 @@ public class LivetestPsiTreeChangeListenerImpl implements PsiTreeChangeListener 
 
     @Override public void childAdded(@NotNull PsiTreeChangeEvent psiTreeChangeEvent) {
         log.info(String.format("childAdded | PsiTreeChangeEvent: %s", psiTreeChangeEvent));
-//        Document document =
-//            PsiDocumentManager.getInstance(DataStore.getInstance().getActiveProject())
-//                .getDocument(psiTreeChangeEvent.getFile());
-//        System.out.println("childAdded: " + document.getText());
-
-        
     }
 
     @Override public void childRemoved(@NotNull PsiTreeChangeEvent psiTreeChangeEvent) {

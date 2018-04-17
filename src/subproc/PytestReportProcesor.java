@@ -22,12 +22,18 @@ public class PytestReportProcesor {
     }
 
     public static Map<String, String> getTestNamePathMapping(String report, boolean errorOnly) {
-        return Arrays.stream(getSplit(report)).filter(getStringPredicate(errorOnly))
-            .map(x -> x.split(DOUBLE_DASH_DELIMITER)).collect(getMapCollector());
+        return Arrays
+            .stream(getSplit(report))
+            .filter(getStringPredicate(errorOnly))
+            .map(x -> x.split(DOUBLE_DASH_DELIMITER))
+            .collect(getMapCollector());
     }
 
     public static Map<String, Boolean> getTestNameStatusMapping(String report) {
-        return Arrays.stream(getSplit(report)).filter(PytestReportProcesor::isStatus).map(getNameAndStatus())
+        return Arrays
+            .stream(getSplit(report))
+            .filter(PytestReportProcesor::isStatus)
+            .map(getNameAndStatus())
             .collect(getNameStatusCollector());
     }
 

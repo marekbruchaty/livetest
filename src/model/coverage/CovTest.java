@@ -4,11 +4,13 @@ public class CovTest {
     private String name;
     private String filePath;
     private boolean passing;
+    private int failCounter;
 
     public CovTest(String name) {
         this.name = name;
         this.filePath = null;
         this.passing = false;
+        this.failCounter = 0;
     }
 
     public String getName() {
@@ -33,5 +35,13 @@ public class CovTest {
 
     public void setPassing(boolean passing) {
         this.passing = passing;
+    }
+
+    public void incrementFailCounter() {
+        this.failCounter++;
+    }
+
+    public int getFailCounter() {
+        return failCounter;
     }
 }

@@ -20,6 +20,5 @@ public class PluginStatus extends AnAction {
         LOGGER.info("Hello action activated.");
         Project project = e.getProject();
         VirtualFileUtils.getAllProjectFiles(project);
-//        Messages.showMessageDialog(project, "Hello world!", "Greeting", Messages.getInformationIcon());
     }
 }

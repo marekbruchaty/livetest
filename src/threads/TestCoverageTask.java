@@ -6,15 +6,13 @@ import editor.Highlighter;
 import model.coverage.CovFile;
 import model.coverage.CovLine;
 import model.coverage.CovTest;
+import org.jetbrains.annotations.NotNull;
 import resources.CoverageLoader;
 import resources.DataStore;
 import subproc.PytestExecutor;
 import subproc.PytestReportProcesor;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -85,19 +83,35 @@ public class TestCoverageTask {
                     continue;
                 }
 
-                for (String testName : covLine.getTests()) {
-                    runTestForChanges(testName, ds.getCovTest(testName));
+                for (CovTest test : getEffectedTestsPrioritized(covLine)) {
+                    runTestForChanges(test);
                 }
             }
         }
     }
 
-    private void runTestForChanges(String testName, CovTest covTest) {
-        String report = PytestExecutor.runCoverageForTestCase(covTest.getFilePath(), testName);
+    @NotNull private List<CovTest> getEffectedTestsPrioritized(CovLine covLine) {
+        return covLine.getTests()
+            .stream()
+            .map(x -> ds.getCovTest(x))
+            .sorted(Comparator.comparingInt(CovTest::getFailCounter))
+            .collect(Collectors.toList());
+    }
+
+    private void runTestForChanges(CovTest covTest) {
+        String report = PytestExecutor.runCoverageForTestCase(covTest.getFilePath(), covTest.getName());
 
         Map<String, Boolean> map = PytestReportProcesor.getTestNameStatusMapping(report);
         for (Map.Entry<String, Boolean> entry : map.entrySet()) {
-            ds.getCovTest(entry.getKey()).setPassing(entry.getValue());
+            CovTest covTestRecord = ds.getCovTest(entry.getKey());
+            covTestRecord.setPassing(entry.getValue());
+
+            if (!entry.getValue()) {
+                covTestRecord.incrementFailCounter();
+                LOGGER.log(Level.INFO, () -> String
+                    .format("Test %s increment counter increased. Current value %d", covTestRecord.getName(),
+                        covTestRecord.getFailCounter()));
+            }
         }
     }
 
@@ -168,14 +182,14 @@ public class TestCoverageTask {
 
                 boolean isLineModified = false;
                 HashSet<Integer> modifiedLines = ds.getModifiedFiles().get(fileName);
-                if (modifiedLines != null ) {
+                if (modifiedLines != null) {
                     isLineModified = modifiedLines.contains(lineNumber - 1);
                 }
 
                 boolean isLineModifiedFinal = isLineModified;
                 ApplicationManager.getApplication().invokeAndWait(() -> ApplicationManager.getApplication()
-                    .runWriteAction(
-                         () -> Highlighter.addLineHighlight(fileName, lineNumber, finalHType, isLineModifiedFinal, sb.toString())));
+                    .runWriteAction(() -> Highlighter
+                        .addLineHighlight(fileName, lineNumber, finalHType, isLineModifiedFinal, sb.toString())));
             }
         }
     }
